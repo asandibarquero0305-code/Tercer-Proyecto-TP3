@@ -1,1 +1,33 @@
-funciones
+#Elaborado por Aaron Sandi y Brandon Coronado
+#Ultimo avance: 6-26-2026
+
+import pickle
+
+
+class Configuracion:
+    """
+    Funcionalidad: Guarda la configuración general del estacionamiento.
+    Entrada: Tamaño del parqueo, tiempo de gracia,
+    monto por hora y existencia de parqueos eléctricos.
+    Salida: Objeto de tipo Configuracion.
+    """
+    def __init__(self,tamanoParqueo,tiempoGracia,montoHora,tieneElectrico):
+
+        self.tamanoParqueo=tamanoParqueo
+        self.tiempoGracia=tiempoGracia
+        self.montoHora=montoHora
+        self.tieneElectrico=tieneElectrico
+
+class Estacionamiento:
+    """
+    Funcionalidad: Almacena toda la información de un vehículo
+    estacionado.
+    Entrada: ID, información del vehículo, estadía y pago.
+    Salida: Objeto de tipo Estacionamiento.
+    """
+    def __init__(self, id, info, estadia, pago):
+
+        self.id = id
+        self.info = info
+        self.estadia = estadia
+        self.pago = pago
