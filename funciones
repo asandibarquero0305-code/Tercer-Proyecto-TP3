@@ -31,3 +31,18 @@ class Estacionamiento:
         self.info = info
         self.estadia = estadia
         self.pago = pago
+
+def cargarConfiguracion():
+    """
+    Funcionalidad: Carga la configuración del estacionamiento desde la memoria secundaria.
+    Entrada: No recibe parámetros.
+    Salida: Objeto de tipo Configuracion si existe.
+    None si todavía no se ha creado una configuración.
+    """
+    try:
+        archivo = open("configuracion.pkl","rb")
+        configuracion = pickle.load(archivo)
+        archivo.close()
+        return configuracion
+    except:
+        return None
