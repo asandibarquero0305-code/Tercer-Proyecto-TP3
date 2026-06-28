@@ -25,11 +25,92 @@ class Estacionamiento:
     Entrada: ID, información del vehículo, estadía y pago.
     Salida: Objeto de tipo Estacionamiento.
     """
-    def __init__(self,tamanoParqueo,tiempoGracia,montoHora,tieneElectrico):
+    def __init__(self, id, info, estadia, pago):
         self.id = id
-        self.info = info
-        self.estadia = estadia
-        self.pago = pago
+        self.info = info        # (placa, marca, color, tipo)
+        self.estadia = estadia  # [ubicacion, entrada, salida]
+        self.pago = pago    
+
+MARCAS = [
+    "Toyota", "Hyundai", "Kia", "Honda", "Nissan",
+    "Mazda", "Chevrolet", "Ford", "Mitsubishi", "Suzuki"
+]
+ 
+COLORES = [
+    "Blanco", "Negro", "Gris", "Rojo", "Azul",
+    "Verde", "Amarillo", "Plateado", "Cafe", "Naranja"
+]
+ 
+TIPOS = ["Sedan", "SUV", "Pickup", "Hatchback", "Van", "Deportivo"]
+ 
+TIPOS_PAGO = {1: "Efectivo", 2: "SINPE", 3: "Tarjeta"}
+ 
+ARCHIVO_BD = "estacionamientos.pkl"
+ARCHIVO_CONFIG = "configuracion.pkl"
+
+def cargarConfiguracion():
+    """
+    Funcionalidad: Carga la configuracion del estacionamiento desde memoria secundaria.
+    Entrada: No recibe parametros.
+    Salida: cfg (Configuracion): Objeto de configuracion si existe el archivo.
+    None si no se ha creado configuracion aun.
+    """
+    try:
+        archivo = open(ARCHIVO_CONFIG, "rb")
+        cfg = pickle.load(archivo)
+        archivo.close()
+        return cfg
+    except:
+        return None
+ 
+ 
+def guardarConfiguracion(cfg):
+    """
+    Funcionalidad: Guarda el objeto de configuracion en memoria secundaria.
+    Entrada: cfg (Configuracion): Objeto con la configuracion actual.
+    Salida: No retorna valor. Escribe el archivo configuracion.pkl.
+    """
+     archivo = open(ARCHIVO_CONFIG, "wb")
+    pickle.dump(cfg, archivo)
+    archivo.close()
+ 
+ 
+def cargarBD():
+    """
+    Funcionalidad: Carga la lista de objetos Estacionamiento desde memoria secundaria.
+    Entrada: No recibe parametros.
+    Salida:
+    - lista (list): Lista de objetos Estacionamiento.
+    - Lista vacia si no existe el archivo.
+    """
+ 
+    try:
+        archivo = open(ARCHIVO_BD, "rb")
+        lista = pickle.load(archivo)
+        archivo.close()
+        return lista
+    except:
+        return []
+ 
+ 
+def guardarBD(lista):
+    """
+    Funcionalidad: Guarda la lista de objetos Estacionamiento en memoria secundaria.
+    Entrada: lista (list): Lista de objetos Estacionamiento a persistir.
+    Salida: No retorna valor. Escribe el archivo estacionamientos.pkl.
+    """
+    archivo = open(ARCHIVO_BD, "wb")
+    pickle.dump(lista, archivo)
+    archivo.close()
+
+
+
+
+
+
+
+
+
 
 def cargarConfiguracion():
     """
