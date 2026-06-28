@@ -1,0 +1,59 @@
+Avance #1 Brandon Coronado
+
+Fecha: 27/06/2026  10:52 am
+Integrante: Brandon Coronado
+
+Trabajo realizado:
+
+* Realicé una lectura completa de la Tarea Programada #3 con el fin de comprender el funcionamiento general del sistema de parqueo y los requerimientos solicitados.
+* Analicé específicamente las responsabilidades asignadas al Estudiante 1 (E1) para identificar cuáles módulos y funcionalidades debo desarrollar.
+* Revisé nuevamente el material suministrado por la profesora sobre Programación Orientada a Objetos, con énfasis en la creación de clases, atributos, métodos, instanciación de objetos y organización del código en módulos.
+* Se inició la planificación de la estructura del proyecto, definiendo las clases principales y la forma en que se relacionarán entre sí durante el desarrollo del sistema.
+
+Problemas encontrados:
+
+Al inicio me costó identificar con claridad cuáles funcionalidades pertenecían al Estudiante 1 y cómo se relacionaban con las tareas asignadas al Estudiante 2, especialmente en cuanto al intercambio de información entre ambos módulos.
+
+Solución aplicada:
+
+Realicé una segunda lectura de la distribución de responsabilidades incluida en la tarea programada y elaboré una lista con las funciones que corresponden exclusivamente al E1, lo que permitió aclarar el alcance de mi parte del proyecto.
+
+Evidencia:
+
+* Lectura y análisis completo de la Tarea Programada #3.
+* Revisión del material de Programación Orientada a Objetos proporcionado por la profesora.
+* Organización inicial de las responsabilidades correspondientes al Estudiante 1.
+
+⸻
+
+Avance #2 Brandon Coronado
+
+Fecha: 27/05/2026, Empecé a las 5pm, y terminé a las 10:50 pm aprox, me tomé algunos descansos
+Integrante: Brandon Coronado
+
+Trabajo realizado:
+
+* Se desarrolló la estructura inicial del proyecto mediante la creación de las clases principales que serán utilizadas en el sistema de parqueo.
+* Se implementó la clase Vehiculo, encargada de almacenar la información básica de cada vehículo y sus respectivos métodos.
+* Se implementó la clase Voucher, destinada a registrar la información relacionada con la entrada, salida y facturación de cada vehículo.
+* Se implementó la clase Espacio, responsable de representar cada espacio del parqueo, su estado de ocupación y la relación con el vehículo y el voucher correspondiente.
+* En todas las clases se utilizaron constructores y métodos básicos siguiendo el estilo visto durante las lecciones, además de documentar cada método mediante el formato de comentarios solicitado (Funcionalidad, Entrada y Salida).
+
+Problemas encontrados:
+
+Durante el diseño inicial surgieron dudas sobre qué información debía pertenecer a cada clase y cómo relacionar correctamente los objetos Vehículo, Voucher y Espacio sin duplicar información.
+
+Solución aplicada:
+
+Se revisaron nuevamente los ejemplos desarrollados en clase sobre Programación Orientada a Objetos y se reorganizaron los atributos de cada clase para que cada objeto administrara únicamente la información correspondiente a su responsabilidad.
+
+Evidencia:
+
+* Creación de la clase Vehiculo.
+* Creación de la clase Voucher.
+* Creación de la clase Espacio.
+* Implementación de constructores y métodos básicos para cada clase.
+* Documentación de métodos utilizando el formato:
+    * Funcionalidad
+    * Entrada
+    * Salida
