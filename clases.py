@@ -175,6 +175,103 @@ def generarIdsEspacios(tamano, tieneElectrico):
     return ids
 
 
+def abrirVentanaConfiguracion(ventanaPadre):
+    """
+    Funcionalidad: Abre la ventana de configuracion del parqueo. Si no existe configuracion,
+    obliga al usuario a contestarla. Si ya existe, permite actualizarla
+    con confirmacion previa.
+    Entrada: ventanaPadre (tk.Tk o tk.Toplevel): Ventana padre de la aplicacion.
+    Salida: No retorna valor. Modifica el archivo configuracion.pkl.
+    """
+
+    ventana = tk.Toplevel(ventanaPadre)
+    ventana.title("Configuracion del Parqueo")
+    ventana.geometry("470x320")
+    ventana.resizable(False, False)
+    ventana.grab_set()
+
+    cfgExistente = cargarConfiguracion()
+
+    tk.Label(ventana, text="Configuracion del Parqueo",
+        font=("Arial", 14, "bold")).pack(pady=10)
+
+    marco = tk.Frame(ventana)
+    marco.pack(padx=20, fill="x")
+
+    tk.Label(
+        marco,
+        text="Ingrese la cantidad de espacios del estacionamiento:"
+    ).grid(row=0, column=0, sticky="w", pady=5)
+    entradaTamano = tk.Entry(marco, width=10)
+    entradaTamano.grid(row=0, column=1, padx=10)
+
+    tk.Label(
+        marco,
+        text="Ingrese el tiempo de gracia (minutos):"
+    ).grid(row=1, column=0, sticky="w", pady=5)
+    entradaGracia = tk.Entry(marco, width=10)
+    entradaGracia.grid(row=1, column=1, padx=10)
+
+   tk.Label(
+        marco,
+        text="Ingrese el monto por hora (en colones ₡):"
+    ).grid(row=2, column=0, sticky="w", pady=5)
+    entradaMonto = tk.Entry(marco, width=10)
+    entradaMonto.grid(row=2, column=1, padx=10)
+
+   tk.Label(
+        marco,
+        text="¿El parqueo cuenta con espacio para vehículos eléctricos?"
+    ).grid(row=3, column=0, sticky="w", pady=5)
+    varElectrico = tk.BooleanVar()
+    tk.Checkbutton(marco, variable=varElectrico).grid(row=3, column=1, sticky="w", padx=10)
+
+    # Pre-llenar si ya existe configuracion
+    if cfgExistente:
+        entradaTamano.insert(0, str(cfgExistente.tamanoParqueo))
+        entradaGracia.insert(0, str(cfgExistente.tiempoGracia))
+        entradaMonto.insert(0, str(cfgExistente.montoHora))
+        varElectrico.set(cfgExistente.tieneElectrico)
+
+    def guardar():
+        """
+        Funcionalidad: Valida y guarda la configuracion ingresada por el usuario.
+        Entrada: No recibe parametros (lee los campos de la ventana).
+        Salida: No retorna valor. Cierra la ventana si los datos son validos.
+        """
+
+        try:
+            tamano = int(entradaTamano.get())
+            gracia = int(entradaGracia.get())
+            monto = float(entradaMonto.get())
+        except ValueError:
+            messagebox.showerror("Error", "Tamano y gracia deben ser enteros. Monto puede ser decimal.", parent=ventana)
+            return
+
+        if tamano < 1:
+            messagebox.showerror("Error", "El tamano debe ser al menos 1.", parent=ventana)
+            return
+
+        if cfgExistente:
+            confirmado = messagebox.askyesno("Confirmar",
+                "¿Desea actualizar la configuracion del parqueo?\n"
+                "Esto no elimina los vehiculos actuales.", parent=ventana)
+            if not confirmado:
+                return
+
+        nuevaCfg = Configuracion(tamano, gracia, monto, varElectrico.get())
+        guardarConfiguracion(nuevaCfg)
+        messagebox.showinfo("Exito", "Configuracion guardada correctamente.", parent=ventana)
+        ventana.destroy()
+
+    tk.Button(ventana, text="Guardar", command=guardar,
+              bg="#1a3a6b", fg="white", font=("Arial", 11, "bold"),
+              width=12).pack(pady=18)
+
+
+
+
+
 
 
 
