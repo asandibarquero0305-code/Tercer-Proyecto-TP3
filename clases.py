@@ -104,6 +104,91 @@ def guardarBD(lista):
     archivo.close()
 
 
+def calcularEspeciales(tamano):
+    """
+    Funcionalidad: Calcula la cantidad de espacios especiales requeridos por ley. Minimo 2 si el parqueo es pequeno (5% resulta en menos de 2).
+    Entrada: tamano (int): Cantidad total de espacios del parqueo.
+    Salida: especiales (int): Cantidad de espacios especiales a reservar.
+    """
+
+    especiales = int(tamano * 0.05)
+    if tamano * 0.05 - especiales > 0:
+        especiales += 1
+    if especiales < 2:
+        especiales = 2
+    return especiales
+
+
+def calcularTopeMaximoMasivo(tamano, tieneElectrico):
+    """
+    Funcionalidad: Calcula cuantos espacios generales se pueden llenar masivamente,
+    respetando especiales, electrico y el 5% libre obligatorio.
+    Entrada:-tamano (int): Total de espacios del parqueo.
+    -tieneElectrico (bool): Si existe espacio electrico reservado.
+    Salida: tope (int): Cantidad maxima de espacios generales a llenar.
+    """
+
+    especiales = calcularEspeciales(tamano)
+    if tieneElectrico:
+        electrico = 1
+    else:
+        electrico = 0
+    porAsignar = tamano - especiales - electrico
+    reservaLibre = int(porAsignar * 0.05)
+    if porAsignar * 0.05 - reservaLibre > 0:
+        reservaLibre += 1
+    tope = porAsignar - reservaLibre
+    
+    return tope
+
+
+def generarIdsEspacios(tamano, tieneElectrico):
+    """
+    Funcionalidad: Genera la lista ordenada de IDs de todos los espacios del parqueo.
+    Formato: 'E-01' especiales, 'EL-01' electrico, 'G-01' generales.
+    Entrada: -tamano (int): Total de espacios del parqueo.
+    -tieneElectrico (bool): Si existe espacio electrico.
+    Salida: ids (list): Lista de strings con todos los IDs de espacios.
+    """
+
+    especiales = calcularEspeciales(tamano)
+    ids = []
+    for i in range(1, especiales + 1):
+        if i < 10:
+            idEspacio = "E-0" + str(i)
+        else:
+            idEspacio = "E-" + str(i)
+        ids.append(idEspacio)
+    if tieneElectrico:
+        ids.append("EL-01")
+        electrico = 1
+    else:
+        electrico = 0
+    generales = tamano - especiales - electrico
+    for i in range(1, generales + 1):
+        if i < 10:
+            idEspacio = "G-0" + str(i)
+        else:
+            idEspacio = "G-" + str(i)
+        ids.append(idEspacio)
+
+    return ids
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def cargarConfiguracion():
     """
     Funcionalidad: Carga la configuración del estacionamiento desde la memoria secundaria.
