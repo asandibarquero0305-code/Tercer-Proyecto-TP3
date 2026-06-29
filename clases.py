@@ -70,7 +70,7 @@ def guardarConfiguracion(cfg):
     Entrada: cfg (Configuracion): Objeto con la configuracion actual.
     Salida: No retorna valor. Escribe el archivo configuracion.pkl.
     """
-     archivo = open(ARCHIVO_CONFIG, "wb")
+    archivo = open(ARCHIVO_CONFIG, "wb")
     pickle.dump(cfg, archivo)
     archivo.close()
  
@@ -102,14 +102,6 @@ def guardarBD(lista):
     archivo = open(ARCHIVO_BD, "wb")
     pickle.dump(lista, archivo)
     archivo.close()
-
-
-
-
-
-
-
-
 
 
 def cargarConfiguracion():
