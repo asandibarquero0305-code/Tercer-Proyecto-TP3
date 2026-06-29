@@ -61,7 +61,7 @@ Evidencia:
 
 
 Avance #3 Brandon Coronado
-Fecha: 28/06/2026 Hora finaliación: 9:50pm
+Fecha: 28/06/2026 Hora a la que termino: 9:50pm
 Integrante: Brandon Coronado
 
 Trabajo realizado:
@@ -96,3 +96,31 @@ Evidencia:
     * facturarEspacio()
     * crearVentanaEstacionamiento()
 * Integración inicial de la lógica del sistema con la interfaz gráfica mediante Tkinter.
+
+
+Avance #4 Brandon Coronado
+Fecha: 03/06/2026 Hora a la que termino: 11:15
+Integrante: Brandon Coronado
+
+Trabajo realizado:
+
+* Se continuó con el desarrollo del archivo principal del sistema de parqueo, completando las funciones que habían quedado pendientes.
+* Se implementó la función crearMenuEspacio(), la cual genera una ventana con las opciones disponibles para cada espacio de parqueo, permitiendo acceder a las acciones correspondientes según el espacio seleccionado.
+* Se desarrolló la función crearVentanaPrincipal(), encargada de construir el menú principal del sistema mediante la interfaz gráfica de Tkinter, incorporando los botones necesarios para acceder a las funcionalidades implementadas.
+* Se realizaron pruebas de funcionamiento para verificar la correcta comunicación entre la ventana principal y las demás funciones desarrolladas durante los avances anteriores.
+* Además, se revisó la organización del código para mantener una estructura ordenada y acorde con el estilo utilizado durante el curso.
+
+Problemas encontrados:
+
+Durante la integración de la ventana principal surgieron algunos inconvenientes para enlazar correctamente las funciones con los botones de la interfaz, ya que algunas acciones no respondían de la forma esperada al ser seleccionadas.
+
+Solución aplicada:
+
+Se revisó la asignación de los comandos de cada botón y se realizaron pruebas individuales sobre cada función hasta comprobar que todas podían ejecutarse correctamente desde la interfaz gráfica.
+
+Evidencia:
+
+* Implementación de la función crearMenuEspacio().
+* Implementación de la función crearVentanaPrincipal().
+* Integración de ambas funciones con el resto del sistema.
+* Pruebas básicas de navegación entre las ventanas del programa utilizando Tkinter.
