@@ -57,3 +57,42 @@ Evidencia:
     * Funcionalidad
     * Entrada
     * Salida
+
+
+
+Avance #3 Brandon Coronado
+Fecha: 28/06/2026 Hora finaliación: 9:50pm
+Integrante: Brandon Coronado
+
+Trabajo realizado:
+
+* Se inició el desarrollo del archivo principal (main.py) correspondiente a las funciones asignadas al Estudiante 1.
+* Se implementó la inicialización de las listas principales que almacenarán los espacios, vehículos y vouchers utilizados por el sistema.
+* Se desarrolló la función crearEstacionamiento(), encargada de generar los espacios de parqueo con sus respectivos tipos (General, Especial y Eléctrico).
+* Se implementó la función crearVehiculosYVouchers() para cargar los vehículos de prueba necesarios durante las primeras etapas del desarrollo.
+* Se desarrolló la función buscarEspacioLibre(), la cual permite localizar el primer espacio disponible para estacionar un vehículo.
+* Se implementó la función estacionarVehiculo(), encargada de validar la placa ingresada, crear el voucher correspondiente y asignar el vehículo a un espacio libre.
+* Se desarrolló la función observarEspacio(), permitiendo consultar la información de un espacio de parqueo y del vehículo estacionado cuando corresponda.
+* Se implementó la función facturarEspacio(), la cual registra la salida del vehículo, genera la información de pago y libera el espacio utilizado.
+* Finalmente, se desarrolló la función crearVentanaEstacionamiento(), encargada de representar gráficamente el estado del parqueo mediante botones en la interfaz utilizando Tkinter.
+
+Problemas encontrados:
+
+Durante el desarrollo de la interfaz gráfica surgieron algunas dudas sobre la forma correcta de asociar cada botón con su respectivo objeto Espacio, ya que cada botón debía representar un espacio diferente dentro del estacionamiento.
+
+Solución aplicada:
+
+Se revisaron nuevamente los ejemplos vistos en clase sobre Tkinter y la creación dinámica de botones. Después de varias pruebas se logró generar correctamente la ventana del estacionamiento y representar visualmente el estado de cada espacio.
+
+Evidencia:
+
+* Implementación de la estructura inicial del archivo main.py.
+* Desarrollo de las funciones:
+    * crearEstacionamiento()
+    * crearVehiculosYVouchers()
+    * buscarEspacioLibre()
+    * estacionarVehiculo()
+    * observarEspacio()
+    * facturarEspacio()
+    * crearVentanaEstacionamiento()
+* Integración inicial de la lógica del sistema con la interfaz gráfica mediante Tkinter.
