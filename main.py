@@ -168,3 +168,45 @@ def facturarEspacio(espacio):
     espacio.liberarEspacio()
 
     messagebox.showinfo("Factura", mensaje)
+
+
+"""
+Funcionalidad:
+Crea una ventana con las opciones para un espacio seleccionado.
+
+Entrada:
+espacio: objeto de tipo Espacio.
+
+Salida:
+Muestra botones para observar o facturar el espacio.
+"""
+def crearMenuEspacio(espacio):
+    ventana = Toplevel()
+    ventana.title("Espacio " + str(espacio.numero))
+
+    Button(ventana, text="Observar espacio", width=25, command=lambda: observarEspacio(espacio)).pack(pady=5)
+    Button(ventana, text="Facturar espacio", width=25, command=lambda: facturarEspacio(espacio)).pack(pady=5)
+
+"""
+Funcionalidad:
+Crea la ventana principal del sistema de parqueo.
+
+Entrada:
+No recibe parámetros.
+
+Salida:
+Muestra el menú principal del sistema.
+"""
+def crearVentanaPrincipal():
+    ventana = Tk()
+    ventana.title("Sistema de Parqueo")
+
+    Button(ventana, text="Obtener vehículos", width=30, command=crearVehiculosYVouchers).pack(pady=5)
+    Button(ventana, text="Ver estacionamiento", width=30, command=crearVentanaEstacionamiento).pack(pady=5)
+    Button(ventana, text="Estacionar vehículo", width=30, command=estacionarVehiculo).pack(pady=5)
+    Button(ventana, text="Salir", width=30, command=ventana.destroy).pack(pady=5)
+
+    ventana.mainloop()
+
+crearEstacionamiento()
+crearVentanaPrincipal()
