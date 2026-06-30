@@ -175,3 +175,32 @@ Evidencia:
 
 *Funcion crearCierreDiario terminada
 *Botón de "Cierre Diario" agregado a la ventana principal
+
+
+Avance #7 Brandon Coronado
+Fecha: 30/06/2026   Hora a la que termino: 5:05 pm
+Integrante: Brandon Coronado
+Trabajo realizado:
+
+* Se continuó con el desarrollo de los reportes correspondientes al sistema de parqueo.
+* Se implementó la función exportarCierreCSV(), encargada de generar un archivo en formato .csv con la información almacenada en listaReporteDia, permitiendo posteriormente abrir el archivo en Microsoft Excel para verificar los datos del cierre diario.
+* Se desarrolló la función crearCierreXML(), la cual genera un archivo XML con la información del cierre diario, organizando las facturas según el tipo de pago (efectivo, SINPE y tarjeta), de acuerdo con los requerimientos establecidos en la tarea programada.
+* Se integraron ambas funcionalidades a la interfaz gráfica mediante la incorporación de nuevos botones en la ventana principal del sistema, facilitando el acceso a la exportación del cierre diario y a la generación del archivo XML.
+* Se realizaron pruebas básicas para verificar la correcta creación de ambos archivos y comprobar que la información almacenada en listaReporteDia se exportara correctamente.
+
+Problemas encontrados:
+
+Durante el desarrollo surgieron dudas sobre la estructura que debía tener el archivo XML y la forma adecuada de organizar la información por tipo de pago, además de la escritura correcta de los archivos utilizando Python.
+
+Solución aplicada:
+
+Se revisó la sintaxis para la creación y escritura de archivos de texto en Python, así como la estructura básica de documentos XML. Posteriormente se implementaron ciclos para recorrer listaReporteDia y clasificar automáticamente las facturas según el tipo de pago antes de almacenarlas en el archivo correspondiente.
+
+Evidencia:
+
+* Implementación de la función exportarCierreCSV().
+* Implementación de la función crearCierreXML().
+* Generación automática del archivo cierreDiario.csv.
+* Generación automática del archivo cierrePorTipoPago.xml.
+* Integración de ambas opciones mediante nuevos botones en la ventana principal del sistema.
+* Pruebas de funcionamiento de la exportación de reportes.

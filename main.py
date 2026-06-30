@@ -416,6 +416,107 @@ def crearCierreDiario():
             actualizarVentanaEstacionamiento()
 
             messagebox.showinfo("Cierre diario", reporte)
+
+
+"""
+Funcionalidad:
+Exporta la información del cierre diario a un archivo CSV para poder
+abrirlo posteriormente en Excel.
+
+Entrada:
+No recibe parámetros.
+
+Salida:
+Crea un archivo llamado cierreDiario.csv con la información almacenada
+en listaReporteDia.
+"""
+def exportarCierreCSV():
+    if len(listaReporteDia) == 0:
+        messagebox.showwarning("Error", "No hay datos de cierre diario para exportar.")
+        return
+
+    archivo = open("cierreDiario.csv", "w")
+
+    for dato in listaReporteDia:
+        linea = str(dato[0]) + ","
+        linea += dato[1] + ","
+        linea += dato[2] + ","
+        linea += dato[3] + ","
+        linea += dato[4] + ","
+        linea += str(dato[5]) + "\n"
+
+        archivo.write(linea)
+
+    archivo.close()
+
+    messagebox.showinfo("CSV", "Archivo cierreDiario.csv creado correctamente.")
+
+"""
+Funcionalidad:
+Crea un archivo XML separando la información del cierre diario por tipo
+de pago: efectivo, sinpe y tarjeta.
+
+Entrada:
+No recibe parámetros.
+
+Salida:
+Crea un archivo llamado cierrePorTipoPago.xml.
+"""
+def crearCierreXML():
+    if len(listaReporteDia) == 0:
+        messagebox.showwarning("Error", "No hay datos de cierre diario para crear el XML.")
+        return
+
+    archivo = open("cierrePorTipoPago.xml", "w")
+
+    archivo.write("<cierre>\n")
+
+    archivo.write("  <efectivo>\n")
+    for dato in listaReporteDia:
+        if dato[4] == "efectivo":
+            archivo.write("    <factura>\n")
+            archivo.write("      <ubicacion>" + str(dato[0]) + "</ubicacion>\n")
+            archivo.write("      <placa>" + dato[1] + "</placa>\n")
+            archivo.write("      <horaEntrada>" + dato[2] + "</horaEntrada>\n")
+            archivo.write("      <horaSalida>" + dato[3] + "</horaSalida>\n")
+            archivo.write("      <tipoPago>" + dato[4] + "</tipoPago>\n")
+            archivo.write("      <monto>" + str(dato[5]) + "</monto>\n")
+            archivo.write("    </factura>\n")
+    archivo.write("  </efectivo>\n")
+
+    archivo.write("  <sinpe>\n")
+    for dato in listaReporteDia:
+        if dato[4] == "sinpe":
+            archivo.write("    <factura>\n")
+            archivo.write("      <ubicacion>" + str(dato[0]) + "</ubicacion>\n")
+            archivo.write("      <placa>" + dato[1] + "</placa>\n")
+            archivo.write("      <horaEntrada>" + dato[2] + "</horaEntrada>\n")
+            archivo.write("      <horaSalida>" + dato[3] + "</horaSalida>\n")
+            archivo.write("      <tipoPago>" + dato[4] + "</tipoPago>\n")
+            archivo.write("      <monto>" + str(dato[5]) + "</monto>\n")
+            archivo.write("    </factura>\n")
+    archivo.write("  </sinpe>\n")
+
+    archivo.write("  <tarjeta>\n")
+    for dato in listaReporteDia:
+        if dato[4] == "tarjeta":
+            archivo.write("    <factura>\n")
+            archivo.write("      <ubicacion>" + str(dato[0]) + "</ubicacion>\n")
+            archivo.write("      <placa>" + dato[1] + "</placa>\n")
+            archivo.write("      <horaEntrada>" + dato[2] + "</horaEntrada>\n")
+            archivo.write("      <horaSalida>" + dato[3] + "</horaSalida>\n")
+            archivo.write("      <tipoPago>" + dato[4] + "</tipoPago>\n")
+            archivo.write("      <monto>" + str(dato[5]) + "</monto>\n")
+            archivo.write("    </factura>\n")
+    archivo.write("  </tarjeta>\n")
+
+    archivo.write("</cierre>\n")
+
+    archivo.close()
+
+    messagebox.showinfo("XML", "Archivo cierrePorTipoPago.xml creado correctamente.")
+
+
 """
 Funcionalidad:
 Crea la ventana principal del sistema de parqueo.
@@ -434,6 +535,8 @@ def crearVentanaPrincipal():
     Button(ventana, text="Ver estacionamiento", width=30, command=crearVentanaEstacionamiento).pack(pady=5)
     Button(ventana, text="Estacionar vehículo", width=30, command=estacionarVehiculo).pack(pady=5)
     Button(ventana, text="Cierre Diario", width=30, command=crearCierreDiario).pack(pady=5)
+    Button(ventana, text="Exportar cierre diario a CSV", width=30, command=exportarCierreCSV).pack(pady=5)
+    Button(ventana, text="Cierre por tipo de pago XML", width=30, command=crearCierreXML).pack(pady=5)
     Button(ventana, text="Salir", width=30, command=ventana.destroy).pack(pady=5)
 
     ventana.mainloop()
