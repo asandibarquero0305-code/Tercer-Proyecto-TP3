@@ -6,6 +6,11 @@ from datetime import datetime
 listaEspacios = []
 listaVehiculos = []
 listaVouchers = []
+listaReporteDia = []
+listaBotonesEspacios = []
+
+montoPorHora = 1000
+tiempoGracia = 15
 
 montoPorHora = 1000
 
@@ -69,6 +74,39 @@ def buscarEspacioLibre():
             return espacio
 
     return None
+
+"""
+Funcionalidad:
+Calcula el monto que debe pagar un vehículo según el tiempo utilizado.
+
+Entrada:
+horaEntrada: hora en que ingresó el vehículo.
+horaSalida: hora en que salió el vehículo.
+
+Salida:
+Retorna el monto total a pagar.
+"""
+def calcularMonto(horaEntrada, horaSalida):
+    formato = "%H:%M"
+
+    entrada = datetime.strptime(horaEntrada, formato)
+    salida = datetime.strptime(horaSalida, formato)
+
+    diferencia = salida - entrada
+    minutos = diferencia.seconds // 60
+
+    if minutos <= tiempoGracia:
+        return 0
+
+    horas = minutos // 60
+
+    if minutos % 60 != 0:
+        horas += 1
+
+    monto = horas * montoPorHora
+
+    return monto
+
 
 """
 Funcionalidad:
@@ -154,7 +192,7 @@ def facturarEspacio(espacio):
 
     tipoPago = simpledialog.askstring("Pago", "Tipo de pago: efectivo, sinpe o tarjeta")
     horaSalida = datetime.now().strftime("%H:%M")
-    monto = montoPorHora
+    monto = calcularMonto(espacio.voucher.horaEntrada, horaSalida)
 
     espacio.voucher.asignarSalida(horaSalida, tipoPago, monto)
 
@@ -165,9 +203,65 @@ def facturarEspacio(espacio):
     mensaje += "\nTipo pago: " + tipoPago
     mensaje += "\nMonto: " + str(monto)
 
+
+
+    datoReporte = [
+        espacio.numero,
+        espacio.vehiculo.placa,
+        espacio.voucher.horaEntrada,
+        horaSalida,
+        tipoPago,
+        monto
+    ]
+
+    listaReporteDia.append(datoReporte)
+
     espacio.liberarEspacio()
 
     messagebox.showinfo("Factura", mensaje)
+
+
+"""
+Funcionalidad:
+Crea una ventana para mostrar gráficamente los espacios del parqueo.
+
+Entrada:
+No recibe parámetros.
+
+Salida:
+Muestra una ventana con botones que representan los espacios.
+"""
+def crearVentanaEstacionamiento():
+    ventana = Toplevel()
+    ventana.title("Estacionamiento")
+
+    listaBotonesEspacios.clear()
+
+    fila = 0
+    columna = 0
+
+    for espacio in listaEspacios:
+        if espacio.estado == "Libre":
+            color = "green"
+        else:
+            color = "red"
+
+        boton = Button(
+            ventana,
+            text=str(espacio.numero) + "\n" + espacio.tipo,
+            bg=color,
+            width=12,
+            height=3,
+            command=lambda e=espacio: crearMenuEspacio(e)
+        )
+
+        boton.grid(row=fila, column=columna, padx=5, pady=5)
+
+        columna += 1
+
+        if columna == 5:
+            columna = 0
+            fila += 1
 
 
 """
@@ -186,6 +280,112 @@ def crearMenuEspacio(espacio):
 
     Button(ventana, text="Observar espacio", width=25, command=lambda: observarEspacio(espacio)).pack(pady=5)
     Button(ventana, text="Facturar espacio", width=25, command=lambda: facturarEspacio(espacio)).pack(pady=5)
+
+
+
+"""
+Funcionalidad:
+Actualiza los colores de los botones del estacionamiento según el estado
+de cada espacio.
+
+Entrada:
+No recibe parámetros.
+
+Salida:
+Cambia el color de los botones del parqueo.
+"""
+def actualizarVentanaEstacionamiento():
+    contador = 0
+
+    for espacio in listaEspacios:
+        if espacio.estado == "Libre":
+            color = "green"
+        else:
+            color = "red"
+
+        if contador < len(listaBotonesEspacios):
+            listaBotonesEspacios[contador].config(bg=color)
+
+        contador += 1
+
+
+
+
+"""
+Funcionalidad:
+Solicita el tipo de pago para una factura del cierre diario.
+
+Entrada:
+placa: placa del vehículo que se va a facturar.
+
+Salida:
+Retorna el tipo de pago ingresado por el usuario.
+"""
+def solicitarTipoPago(placa):
+    tipoPago = simpledialog.askstring(
+        "Tipo de pago",
+        "Digite el tipo de pago para la placa " + placa + "\nefectivo, sinpe o tarjeta:"
+    )
+
+    if tipoPago == None:
+        tipoPago = "efectivo"
+
+    tipoPago = tipoPago.lower()
+
+    if tipoPago != "efectivo" and tipoPago != "sinpe" and tipoPago != "tarjeta":
+        tipoPago = "efectivo"
+
+    return tipoPago
+
+
+
+"""
+Funcionalidad:
+Realiza el cierre diario del parqueo, factura todos los espacios ocupados
+y genera un resumen con los montos recaudados.
+
+Entrada:
+No recibe parámetros.
+
+Salida:
+Muestra el reporte del cierre diario y libera los espacios ocupados.
+"""
+def crearCierreDiario():
+    totalEfectivo = 0
+    totalSinpe = 0
+    totalTarjeta = 0
+    totalDia = 0
+
+    huboFacturas = False
+
+    fecha = datetime.now().strftime("%d/%m/%Y")
+    horaSalida = datetime.now().strftime("%H:%M")
+
+    reporte = "CIERRE DIARIO\n"
+    reporte += "Fecha: " + fecha + "\n\n"
+    reporte += "Ubicación | Placa | Entrada | Salida | Pago | Monto\n"
+    reporte += "--------------------------------------------------\n"
+
+    for espacio in listaEspacios:
+        if espacio.estado == "Ocupado":
+            huboFacturas = True
+
+            placa = espacio.vehiculo.placa
+            tipoPago = solicitarTipoPago(placa)
+            monto = calcularMonto(espacio.voucher.horaEntrada, horaSalida)
+
+            espacio.voucher.asignarSalida(horaSalida, tipoPago, monto)
+
+            datoReporte = [
+                espacio.numero,
+                placa,
+                espacio.voucher.horaEntrada,
+                horaSalida,
+                tipoPago,
+                monto
+            ]
+
+            listaReporteDia.append(datoReporte)
 
 """
 Funcionalidad:
