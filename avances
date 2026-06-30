@@ -125,3 +125,34 @@ Evidencia:
 * Integración de ambas funciones con el resto del sistema.
 * Pruebas básicas de navegación entre las ventanas del programa utilizando Tkinter.
 
+
+Avance #5 Brandon Coronado
+Fecha: 29/06/2026 Hora a la que termino: 11:00 pm
+Integrante: Brandon Coronado
+
+Trabajo realizado:
+
+* Se realizaron ajustes en el archivo principal del sistema para preparar la lógica de facturación y cierre diario.
+* Se agregaron nuevas listas globales, entre ellas listaReporteDia para almacenar la información de las facturas generadas durante el día y listaBotonesEspacios para controlar la actualización visual de los espacios del parqueo.
+* Se incorporó la variable tiempoGracia, con el fin de considerar un tiempo mínimo antes de cobrar la estadía del vehículo.
+* Se implementó la función calcularMonto(), encargada de calcular el monto a pagar según la hora de entrada, hora de salida, tiempo de gracia y monto por hora.
+* Se modificó la función facturarEspacio() para que utilice el cálculo real del monto y guarde los datos de la factura en listaReporteDia.
+* Se agregó la función actualizarVentanaEstacionamiento(), con el objetivo de actualizar los colores de los botones del parqueo cuando un espacio cambia de estado.
+* Se inició el desarrollo de la función crearCierreDiario(), avanzando hasta la creación del registro de datos del cierre y su almacenamiento en listaReporteDia mediante listaReporteDia.append(datoReporte).
+
+Problemas encontrados:
+
+Durante este avance fue necesario analizar cómo guardar correctamente la información de cada factura para poder reutilizarla posteriormente en el cierre diario, el XML y el archivo CSV.
+
+Solución aplicada:
+
+Se decidió utilizar una lista llamada listaReporteDia, en la cual se almacenan los datos principales de cada factura, como número de espacio, placa, hora de entrada, hora de salida, tipo de pago y monto. Esto permite mantener la información organizada para los reportes posteriores.
+
+Evidencia:
+
+* Creación de listaReporteDia.
+* Creación de listaBotonesEspacios.
+* Implementación de calcularMonto().
+* Modificación de facturarEspacio().
+* Implementación de actualizarVentanaEstacionamiento().
+* Inicio de la función crearCierreDiario() hasta la línea listaReporteDia.append(datoReporte).
