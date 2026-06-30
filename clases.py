@@ -269,6 +269,340 @@ def abrirVentanaConfiguracion(ventanaPadre):
               width=12).pack(pady=18)
 
 
+def abrirVentanaEspacio(ventanaPadre, espacioId, lista, cfg):
+    """
+    Funcionalidad:
+    Abre la ventana de detalle de un espacio del parqueo.
+    Si esta ocupado (rojo): muestra informacion y permite pagar (Facturar).
+    Si esta libre (verde): permite estacionar un vehiculo nuevo.
+    Entrada:
+    - ventanaPadre (tk.Toplevel): Ventana del mapa del parqueo.
+    - espacioId (str): ID del espacio seleccionado (ej. 'G-01').
+    - lista (list): Lista de objetos Estacionamiento (BD en memoria).
+    - cfg (Configuracion): Configuracion actual del parqueo.
+    Salida: No retorna valor. Modifica la lista y el archivo pkl si se realizan cambios.
+    """
+    objEncontrado = None  # Buscar si hay vehiculo en ese espacio sin fecha de salida
+    for obj in lista:
+        ubicacion = obj.estadia[0]
+        salida = obj.estadia[2]
+        if ubicacion == espacioId and (salida == "" or salida is None):
+            objEncontrado = obj
+            break
+
+    ventana = tk.Toplevel(ventanaPadre)
+    ventana.resizable(False, False)
+    ventana.grab_set()
+
+    if objEncontrado:
+        ventana.title("Espacio Ocupado - " + espacioId)
+        ventana.geometry("386x307")
+
+        tk.Label(ventana, text="Espacio: " + espacioId),
+                 font=("Arial", 13, "bold"), fg="#c0392b").pack(pady=10)
+
+        placa, marca, color, tipo = objEncontrado.info
+        if isinstance(marca, int) and 1 <= marca <= len(MARCAS):
+            marcaNombre = MARCAS[marca - 1]
+        else:
+            marcaNombre = str(marca)
+        if isinstance(color, int) and 1 <= color <= len(COLORES):
+            colorNombre = COLORES[color - 1]
+        else:
+            colorNombre = str(color)
+        entrada = objEncontrado.estadia[1]
+        marco = tk.Frame(ventana)
+        marco.pack(padx=20, fill="x")
+        campos = [
+            ("# Campo:", espacioId),
+            ("Placa:", str(placa)),
+            ("Marca:", marcaNombre),
+            ("Color:", colorNombre),
+            ("Hora de Entrada:", str(entrada)),
+        ]
+        for etiqueta, valor in campos:
+            fila = tk.Frame(marco)
+            fila.pack(fill="x", pady=2)
+            tk.Label(fila, text=etiqueta, font=("Arial", 10, "bold"), width=18, anchor="w").pack(side="left")
+            tk.Label(fila, text=valor, font=("Arial", 10), anchor="w").pack(side="left")
+
+        def pagar():
+            """
+            Funcionalidad: Registra el pago del espacio: solicita tipo de pago, calcula monto, actualiza el objeto en la lista, guarda la BD y genera la factura PDF.
+            Entrada: No recibe parametros (lee datos del objeto encontrado).
+            Salida: No retorna valor. Actualiza lista, pkl y genera factura PDF.
+            """
+            opciones = ["1 - Efectivo", "2 - SINPE", "3 - Tarjeta"]
+            seleccion = simpledialog.askstring(
+                "Tipo de Pago",
+                "Seleccione tipo de pago:\n1 - Efectivo\n2 - SINPE\n3 - Tarjeta",
+                parent=ventana
+            )
+            if seleccion is None:
+                return
+
+            seleccion = seleccion.strip()
+            if seleccion not in ["1", "2", "3"]:
+                messagebox.showerror("Error", "Opcion invalida. Ingrese 1, 2 o 3.", parent=ventana)
+                return
+
+            tipoPago = int(seleccion)
+            ahoraMismo = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            monto = calcularMonto(objEncontrado.estadia[1], ahoraMismo, cfg)
+
+            confirmado = messagebox.askyesno(
+                "Confirmar Pago",
+                "Monto a cobrar: ₡{:,.0f}\nTipo de pago: {}\n\n¿Confirmar?".format(
+                    monto, TIPOS_PAGO[tipoPago]),
+                parent=ventana
+            )
+            if not confirmado:
+                return
+
+            objEncontrado.estadia[2] = ahoraMismo    # Actualizar objeto en la lista
+            objEncontrado.pago = (monto, tipoPago)
+            guardarBD(lista)
+
+            rutaPdf = crearFacturaPdf(objEncontrado, cfg)
+            messagebox.showinfo("Pago Registrado",
+                "Pago exitoso.\nFactura generada:\n{}" + rutaPdf, parent=ventana)
+            ventana.destroy()
+
+        botones = tk.Frame(ventana)
+        botones.pack(pady=15)
+        tk.Button(botones, text="Pagar", command=pagar,
+                  bg="#27ae60", fg="white", font=("Arial", 11, "bold"), width=10).pack(side="left", padx=10)
+        tk.Button(botones, text="Regresar", command=ventana.destroy,
+                  bg="#7f8c8d", fg="white", font=("Arial", 11, "bold"), width=10).pack(side="left", padx=10)
+
+    else:
+        ventana.title("Estacionar Vehiculo - {}".format(espacioId))
+        ventana.geometry("420x360")
+
+        tk.Label(ventana, text="Espacio Libre: {}".format(espacioId),
+                 font=("Arial", 13, "bold"), fg="#27ae60").pack(pady=10)
+
+        marco = tk.Frame(ventana)
+        marco.pack(padx=20, fill="x")
+
+        tk.Label(marco, text="Placa:", anchor="w").grid(row=0, column=0, sticky="w", pady=4)
+        entradaPlaca = tk.Entry(marco, width=20)
+        entradaPlaca.grid(row=0, column=1, padx=10)
+
+        tk.Label(marco, text="Marca:", anchor="w").grid(row=1, column=0, sticky="w", pady=4)
+        varMarca = tk.StringVar()
+        comboMarca = ttk.Combobox(marco, textvariable=varMarca, values=MARCAS, state="readonly", width=18)
+        comboMarca.grid(row=1, column=1, padx=10)
+
+        tk.Label(marco, text="Color:", anchor="w").grid(row=2, column=0, sticky="w", pady=4)
+        varColor = tk.StringVar()
+        comboColor = ttk.Combobox(marco, textvariable=varColor, values=COLORES, state="readonly", width=18)
+        comboColor.grid(row=2, column=1, padx=10)
+
+        tk.Label(marco, text="Tipo:", anchor="w").grid(row=3, column=0, sticky="w", pady=4)
+        varTipo = tk.StringVar()
+        comboTipo = ttk.Combobox(marco, textvariable=varTipo, values=TIPOS, state="readonly", width=18)
+        comboTipo.grid(row=3, column=1, padx=10)
+
+        tk.Label(marco, text="Hora de Entrada:", anchor="w").grid(row=4, column=0, sticky="w", pady=4)
+        entradaHora = tk.Entry(marco, width=20, state="readonly",
+                                fg="gray",
+                                readonlybackground="#f0f0f0")
+        entradaHora.grid(row=4, column=1, padx=10)
+        entradaHora.config(state="normal")
+        entradaHora.insert(0, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        entradaHora.config(state="readonly")
+
+        tk.Label(marco, text="Tarifa por hora: ₡{:,.0f}".format(cfg.montoHora),
+                 font=("Arial", 10, "italic"), fg="#555").grid(row=5, column=0, columnspan=2, pady=6)
+
+        def estacionar():
+            """
+            Funcionalidad: Valida los campos, crea el objeto Estacionamiento, lo agrega a la lista, guarda la BD y genera el voucher PDF de ingreso.
+            Entrada: No recibe parametros (lee los campos de la ventana).
+            Salida: No retorna valor. Actualiza la lista, el pkl y genera el voucher.
+            """
+            placa = entradaPlaca.get().strip()
+            if not placa:
+                messagebox.showerror("Error", "Debe ingresar la placa.", parent=ventana)
+                return
+            if not varMarca.get():
+                messagebox.showerror("Error", "Debe seleccionar la marca.", parent=ventana)
+                return
+            if not varColor.get():
+                messagebox.showerror("Error", "Debe seleccionar el color.", parent=ventana)
+                return
+            if not varTipo.get():
+                messagebox.showerror("Error", "Debe seleccionar el tipo.", parent=ventana)
+                return
+
+            confirmado = messagebox.askyesno(
+                "Confirmar",
+                "¿Desea estacionar el vehiculo?\nPlaca: {}\nEspacio: {}".format(placa, espacioId),
+                parent=ventana
+            )
+            if not confirmado:
+                return
+
+            horaEntrada = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            marcaIdx = MARCAS.index(varMarca.get()) + 1
+            colorIdx = COLORES.index(varColor.get()) + 1
+            tipoIdx = TIPOS.index(varTipo.get()) + 1
+
+            nuevoObj = Estacionamiento(
+                id=espacioId,
+                info=(placa, marcaIdx, colorIdx, tipoIdx),
+                estadia=[espacioId, horaEntrada, ""],
+                pago=(0, 0)
+            )
+            lista.append(nuevoObj)
+            guardarBD(lista)
+
+            rutaVoucher = crearVoucherPdf(nuevoObj)
+            messagebox.showinfo("Vehiculo Estacionado",
+                "Vehiculo registrado.\nVoucher generado:\n{}".format(rutaVoucher), parent=ventana)
+            ventana.destroy()
+
+        botones = tk.Frame(ventana)
+        botones.pack(pady=12)
+        tk.Button(botones, text="Estacionar", command=estacionar,
+                  bg="#1a3a6b", fg="white", font=("Arial", 11, "bold"), width=12).pack(side="left", padx=10)
+        tk.Button(botones, text="Regresar", command=ventana.destroy,
+                  bg="#7f8c8d", fg="white", font=("Arial", 11, "bold"), width=12).pack(side="left", padx=10)
+
+def abrirVentanaEstacionamiento(ventanaPadre):
+    """
+    Funcionalidad:
+    Abre la ventana grafica del mapa del parqueo con cuadricula interactiva.
+    Cada espacio muestra rojo (ocupado) o verde (libre). Al hacer clic
+    abre la ventana de detalle del espacio correspondiente.
+    Entrada: ventanaPadre (tk.Tk): Ventana principal de la aplicacion.
+    Salida: No retorna valor. Abre una ventana Toplevel con la cuadricula.
+    """
+    cfg = cargarConfiguracion()
+    if not cfg:
+        messagebox.showwarning("Sin Configuracion",
+            "Debe configurar el parqueo primero.", parent=ventanaPadre)
+        return
+
+    lista = cargarBD()
+    ids = generarIdsEspacios(cfg.tamanoParqueo, cfg.tieneElectrico)
+
+    ocupados = set() # IDs ocupados (sin fecha de salida)
+    for obj in lista:
+        if obj.estadia[2] == "" or obj.estadia[2] is None:
+            ocupados.add(obj.estadia[0])
+
+    ventana = tk.Toplevel(ventanaPadre)
+    ventana.title("Ver Estacionamiento")
+    ventana.grab_set()
+
+    columnas = 8 #calc tama;o venntanas
+    filas = (len(ids) + columnas - 1) // columnas
+    anchoVentana = min(850, columnas * 95 + 60)
+    altoVentana = min(700, filas * 75 + 160)
+    ventana.geometry("{}x{}".format(anchoVentana, altoVentana))
+
+    tk.Label(ventana, text="Mapa del Parqueo",
+             font=("Arial", 14, "bold")).pack(pady=8)
+
+    leyenda = tk.Frame(ventana)
+    leyenda.pack()
+    tk.Label(leyenda, text="  ", bg="#27ae60", width=3).pack(side="left", padx=4)
+    tk.Label(leyenda, text="Libre").pack(side="left")
+    tk.Label(leyenda, text="   ", bg="#e74c3c", width=3).pack(side="left", padx=8)
+    tk.Label(leyenda, text="Ocupado").pack(side="left")
+    tk.Label(leyenda, text="   ", bg="#f39c12", width=3).pack(side="left", padx=8)
+    tk.Label(leyenda, text="Especial/Electrico").pack(side="left")
+
+    marco = tk.Frame(ventana)
+    marco.pack(fill="both", expand=True, padx=10, pady=5)
+
+    canvas = tk.Canvas(marco, bg="#ecf0f1")
+    scrollY = ttk.Scrollbar(marco, orient="vertical", command=canvas.yview)
+    scrollX = ttk.Scrollbar(ventana, orient="horizontal", command=canvas.xview)
+    canvas.configure(yscrollcommand=scrollY.set, xscrollcommand=scrollX.set)
+
+    scrollY.pack(side="right", fill="y")
+    scrollX.pack(side="bottom", fill="x")
+    canvas.pack(side="left", fill="both", expand=True)
+
+    frameInternoCuadricula = tk.Frame(canvas, bg="#ecf0f1")
+    canvas.create_window((0, 0), window=frameInternoCuadricula, anchor="nw")
+
+    def actualizarScroll(event):
+        canvas.configure(scrollregion=canvas.bbox("all"))
+
+    frameInternoCuadricula.bind("<Configure>", actualizarScroll)
+
+    botonesEspacios = {}
+
+    def hacerClickEspacio(eid):
+        """
+        Funcionalidad: Maneja el clic sobre un espacio de la cuadricula. Recarga la BD, abre la ventana de detalle y actualiza los colores al cerrarla.
+        Entrada: eid (str): ID del espacio clickeado.
+        Salida: No retorna valor.
+        """
+
+        listaActual = cargarBD()
+        abrirVentanaEspacio(ventana, eid, listaActual, cfg)
+        ventana.wait_window(ventana.winfo_children()[-1] if ventana.winfo_children() else ventana)
+        actualizarColores()
+
+    def actualizarColores():
+        """
+        Funcionalidad: Recarga la BD y actualiza el color de cada boton en la cuadricula segun el estado actual (libre/ocupado).
+        Entrada: No recibe parametros.
+        Salida: No retorna valor. Cambia el color de fondo de los botones.
+        """
+        listaActual = cargarBD()
+        ocupadosActual = set()
+        for obj in listaActual:
+            if obj.estadia[2] == "" or obj.estadia[2] is None:
+                ocupadosActual.add(obj.estadia[0])
+
+        for eid, btn in botonesEspacios.items():
+            if eid.startswith("E-") or eid.startswith("EL-"):
+                colorBase = "#e67e22" if eid not in ocupadosActual else "#e74c3c"
+            else:
+                colorBase = "#27ae60" if eid not in ocupadosActual else "#e74c3c"
+            btn.config(bg=colorBase)
+
+    for indice, eid in enumerate(ids):  # hacer cuadricula
+        fila = indice // columnas
+        col = indice % columnas
+
+        if eid.startswith("E-") or eid.startswith("EL-"):
+            colorFondo = "#e67e22" if eid not in ocupados else "#e74c3c"
+        else:
+            colorFondo = "#27ae60" if eid not in ocupados else "#e74c3c"
+
+        btn = tk.Button(
+            frameInternoCuadricula,
+            text=eid,
+            bg=colorFondo,
+            fg="white",
+            font=("Arial", 8, "bold"),
+            width=8,
+            height=3,
+            relief="raised",
+            command=lambda e=eid: hacerClickEspacio(e)
+        )
+        btn.grid(row=fila, column=col, padx=4, pady=4)
+        botonesEspacios[eid] = btn
+
+    filaExtra = filas
+    tk.Label(frameInternoCuadricula, text="[CASETILLA]",
+             bg="#2c3e50", fg="white", font=("Arial", 8, "bold"),
+             width=10, height=3, relief="ridge").grid(
+        row=filaExtra, column=0, columnspan=2, padx=4, pady=8)
+    tk.Label(frameInternoCuadricula, text="[BANO]",
+             bg="#7f8c8d", fg="white", font=("Arial", 8, "bold"),
+             width=8, height=3, relief="ridge").grid(
+        row=filaExtra, column=2, padx=4, pady=8)
+
+    tk.Button(ventana, text="Cerrar", command=ventana.destroy,
+              bg="#7f8c8d", fg="white", font=("Arial", 10, "bold")).pack(pady=6)
 
 
 
