@@ -156,3 +156,22 @@ Evidencia:
 * Modificación de facturarEspacio().
 * Implementación de actualizarVentanaEstacionamiento().
 * Inicio de la función crearCierreDiario() hasta la línea listaReporteDia.append(datoReporte).
+
+Avance #6 Brandon Coronado
+Fecha: 30/06/2026 Hora a la que termino: 1:00 pm   
+Integrante: Brandon Coronado
+
+Trabajo realizado:
+
+* Se terminó la funcion de crearCierreDiario y se agregó de una el botón que había que poner en la ventana
+
+
+Problemas encontrados:
+Realmente ningún problema con este avance ya que ya sabía lo que tenía que hacer, por lo que se me hio sencillo el terminar la funcion
+
+Solución aplicada:
+
+Evidencia:
+
+*Funcion crearCierreDiario terminada
+*Botón de "Cierre Diario" agregado a la ventana principal
