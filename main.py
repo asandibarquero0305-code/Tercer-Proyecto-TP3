@@ -386,7 +386,36 @@ def crearCierreDiario():
             ]
 
             listaReporteDia.append(datoReporte)
+            reporte += str(espacio.numero) + " | "
+            reporte += placa + " | "
+            reporte += espacio.voucher.horaEntrada + " | "
+            reporte += horaSalida + " | "
+            reporte += tipoPago + " | "
+            reporte += str(monto) + "\n"
 
+            if tipoPago == "efectivo":
+                totalEfectivo += monto
+            elif tipoPago == "sinpe":
+                totalSinpe += monto
+            elif tipoPago == "tarjeta":
+                totalTarjeta += monto
+
+            totalDia += monto
+
+            espacio.liberarEspacio()
+
+            if huboFacturas == False:
+                messagebox.showinfo("Cierre diario", "No existen espacios ocupados para facturar.")
+                return
+
+            reporte += "\nTOTAL EFECTIVO: " + str(totalEfectivo)
+            reporte += "\nTOTAL SINPE: " + str(totalSinpe)
+            reporte += "\nTOTAL TARJETA: " + str(totalTarjeta)
+            reporte += "\nTOTAL DEL DÍA: " + str(totalDia)
+
+            actualizarVentanaEstacionamiento()
+
+            messagebox.showinfo("Cierre diario", reporte)
 """
 Funcionalidad:
 Crea la ventana principal del sistema de parqueo.
@@ -404,6 +433,7 @@ def crearVentanaPrincipal():
     Button(ventana, text="Obtener vehículos", width=30, command=crearVehiculosYVouchers).pack(pady=5)
     Button(ventana, text="Ver estacionamiento", width=30, command=crearVentanaEstacionamiento).pack(pady=5)
     Button(ventana, text="Estacionar vehículo", width=30, command=estacionarVehiculo).pack(pady=5)
+    Button(ventana, text="Cierre Diario", width=30, command=crearCierreDiario).pack(pady=5)
     Button(ventana, text="Salir", width=30, command=ventana.destroy).pack(pady=5)
 
     ventana.mainloop()
