@@ -605,6 +605,263 @@ def abrirVentanaEstacionamiento(ventanaPadre):
               bg="#7f8c8d", fg="white", font=("Arial", 10, "bold")).pack(pady=6)
 
 
+def calcularMonto(entrada, salida, cfg):
+    """
+    Funcionalidad: Calcula el monto a cobrar segun la duracion de la estadia y el tiempo de gracia configurado.
+    Entrada:
+    - entrada (str): Fecha y hora de entrada en formato '%Y-%m-%d %H:%M:%S'.
+    - salida (str): Fecha y hora de salida en formato '%Y-%m-%d %H:%M:%S'.
+    - cfg (Configuracion): Objeto con montoHora y tiempoGracia.
+    Salida:
+    - monto (float): Monto total en colones a cobrar.
+    """
+    dtEntrada = datetime.strptime(str(entrada), "%Y-%m-%d %H:%M:%S")
+    dtSalida = datetime.strptime(str(salida), "%Y-%m-%d %H:%M:%S")
+    minutos = (dtSalida - dtEntrada).total_seconds() / 60
+    minutosFacturables = max(0, minutos - cfg.tiempoGracia)
+    horas = minutosFacturables / 60
+    return round(horas * cfg.montoHora, 0)
+
+
+def generarCodigoQR(datos, nombreArchivo):
+    """
+    Funcionalidad: Genera un codigo QR con los datos indicados y lo guarda como imagen PNG.
+    Entrada:
+    - datos (str): Texto a codificar en el QR.
+    - nombreArchivo (str): Ruta/nombre del archivo PNG a crear.
+    Salida: nombreArchivo (str): Ruta del archivo PNG generado.
+    """
+    imagen = qrcode.make(datos)
+    imagen.save(nombreArchivo)
+    return nombreArchivo
+
+
+def generarNombreVoucher(placa, fechaHoraEntrada):
+    """
+    Funcionalidad: Construye el nombre del archivo voucher segun el formato del enunciado.
+    Entrada:
+    - placa (str): Placa del vehiculo.
+    - fechaHoraEntrada (str): Fecha y hora de entrada como string.
+    Salida: nombre (str): Nombre del archivo con formato voucher_#PLACA_DD-MM-AAAA_HH-mm.pdf
+    """
+
+    try:
+        dt = datetime.strptime(fechaHoraEntrada, "%Y-%m-%d %H:%M:%S")
+        sufijo = dt.strftime("%d-%m-%Y_%H-%M")
+    except:
+        sufijo = fechaHoraEntrada.replace(":", "-").replace(" ", "_")
+
+    return "voucher_#" + str(placa) + "_" + sufijo
+
+
+def generarNombreFactura(placa, fechaHoraSalida):
+    """
+    Funcionalidad: Construye el nombre del archivo factura segun el formato del enunciado.
+    Entrada:
+    - placa (str): Placa del vehiculo.
+    - fechaHoraSalida (str): Fecha y hora de salida como string.
+    Salida: nombre (str): Nombre del archivo con formato factura_#PLACA_DD-MM-AAAA_HH-mm.pdf
+    """
+    try:
+        dt = datetime.strptime(fechaHoraSalida, "%Y-%m-%d %H:%M:%S")
+        sufijo = dt.strftime("%d-%m-%Y_%H-%M")
+    except:
+        sufijo = fechaHoraSalida.replace(":", "-").replace(" ", "_")
+
+    return "factura_#" + str(placa) + "_" + sufijo
+
+
+def crearVoucherPdf(obj):
+    """
+    Funcionalidad: Genera el voucher PDF de ingreso al parqueo con codigo QR incluido. El archivo se guarda en la carpeta actual con el nombre estandar.
+    Entrada: obj (Estacionamiento): Objeto con la informacion del vehiculo.
+    Salida: rutaPdf (str): Ruta del archivo PDF generado.
+    """
+    placa, marca, color, tipo = obj.info
+    ubicacion, entrada, salida = obj.estadia
+    monto, tipoPago = obj.pago
+
+    placaTexto = str(placa) # Datos del QR
+    if isinstance(marca, int) and 1 <= marca <= len(MARCAS):
+        marcaNombre = MARCAS[marca - 1]
+    else:
+        marcaNombre = str(marca)
+    if isinstance(color, int) and 1 <= color <= len(COLORES):
+        colorNombre = COLORES[color - 1]
+    else:
+        colorNombre = str(color)
+    if isinstance(tipo, int) and 1 <= tipo <= len(TIPOS):
+        tipoNombre = TIPOS[tipo - 1]
+    else:
+        tipoNombre = str(tipo)
+    datosQr = placaTexto + "-" + marcaNombre + "-" + tipoNombre + "-" + str(entrada)
+    nombreBase = generarNombreVoucher(str(placa), str(entrada))
+    rutaQr = nombreBase + "_qr.png"
+    rutaPdf = nombreBase + ".pdf"
+
+    generarCodigoQR(datosQr, rutaQr)
+
+    pdf = FPDF()
+    pdf.add_page()
+
+    pdf.set_fill_color(30, 30, 80)
+    pdf.rect(0, 0, 210, 30, 'F')
+    pdf.set_text_color(255, 255, 255)
+    pdf.set_font("Helvetica", "B", 18)
+    pdf.set_xy(0, 8)
+    pdf.cell(210, 10, "VOUCHER DE INGRESO - PARQUEO TEC", align="C")
+
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_xy(15, 38)
+    pdf.set_font("Helvetica", "B", 13)
+    pdf.cell(0, 8, "Informacion del Vehiculo")
+    pdf.ln(12)
+
+    pdf.set_font("Helvetica", "", 11)
+    pdf.set_x(15)
+    filas = [
+        ("Placa:", str(placa)),
+        ("Marca:", marcaNombre),
+        ("Color:", colorNombre),
+        ("Tipo:", tipoNombre),
+        ("Ubicacion:", str(ubicacion)),
+        ("Hora de Entrada:", str(entrada)),
+    ]
+    for etiqueta, valor in filas:
+        pdf.set_x(15)
+        pdf.set_font("Helvetica", "B", 11)
+        pdf.cell(55, 9, etiqueta)
+        pdf.set_font("Helvetica", "", 11)
+        pdf.cell(0, 9, valor)
+        pdf.ln()
+
+    if os.path.exists(rutaQr): # QR
+        pdf.set_xy(140, 40)
+        pdf.image(rutaQr, x=140, y=40, w=55)
+
+    pdf.set_font("Helvetica", "I", 9)
+    pdf.set_xy(15, 175)
+    pdf.set_text_color(120, 120, 120)
+    pdf.cell(0, 6, "Este voucher es su comprobante de ingreso. Conservelo.")
+
+    pdf.output(rutaPdf)
+
+    if os.path.exists(rutaQr):
+        os.remove(rutaQr)
+
+    return rutaPdf
+
+
+def crearFacturaPdf(obj, cfg):
+    """
+    Funcionalidad: Genera la factura PDF de salida del parqueo con todos los detalles de la estadia y el monto cobrado. Incluye codigo QR.
+    Entrada:
+    - obj (Estacionamiento): Objeto con la informacion completa del vehiculo.
+    - cfg (Configuracion): Configuracion del parqueo (para monto/hora y gracia).
+    Salida: rutaPdf (str): Ruta del archivo PDF generado.
+    """
+
+    placa, marca, color, tipo = obj.info
+    ubicacion, entrada, salida = obj.estadia
+    monto, tipoPago = obj.pago
+    if isinstance(marca, int) and 1 <= marca <= len(MARCAS):
+        marcaNombre = MARCAS[marca - 1]
+    else:
+        marcaNombre = str(marca)
+    if isinstance(color, int) and 1 <= color <= len(COLORES):
+        colorNombre = COLORES[color - 1]
+    else:
+        colorNombre = str(color)
+    if isinstance(tipo, int) and 1 <= tipo <= len(TIPOS):
+        tipoNombre = TIPOS[tipo - 1]
+    else:
+        tipoNombre = str(tipo)
+    tipoPagoNombre = TIPOS_PAGO.get(tipoPago, str(tipoPago))
+    datosQr = str(placa) + "-" + marcaNombre + "-" + tipoNombre + "-" + str(salida)
+    nombreBase = generarNombreFactura(str(placa), str(salida))
+    rutaQr = nombreBase + "_qr.png"
+    rutaPdf = nombreBase + ".pdf"
+
+    generarCodigoQR(datosQr, rutaQr)
+
+    try: 
+        dtEntrada = datetime.strptime(str(entrada), "%Y-%m-%d %H:%M:%S") # Calculo horas
+        dtSalida = datetime.strptime(str(salida), "%Y-%m-%d %H:%M:%S")
+        minutos = int((dtSalida - dtEntrada).total_seconds() / 60)
+        horasFacturadas = max(0, minutos - cfg.tiempoGracia)
+        horasFloat = horasFacturadas / 60
+    except:
+        minutos = 0
+        horasFloat = 0
+
+    pdf = FPDF()
+    pdf.add_page()
+
+    pdf.set_fill_color(20, 80, 20)
+    pdf.rect(0, 0, 210, 30, 'F')
+    pdf.set_text_color(255, 255, 255)
+    pdf.set_font("Helvetica", "B", 18)
+    pdf.set_xy(0, 8)
+    pdf.cell(210, 10, "FACTURA - PARQUEO TEC", align="C")
+
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_font("Helvetica", "B", 13)
+    pdf.set_xy(15, 38)
+    pdf.cell(0, 8, "Detalle de Estadia")
+    pdf.ln(12)
+
+    pdf.set_font("Helvetica", "", 11)
+    filas = [
+        ("Placa:", str(placa)),
+        ("Marca:", marcaNombre),
+        ("Color:", colorNombre),
+        ("Tipo:", tipoNombre),
+        ("Ubicacion:", str(ubicacion)),
+        ("Hora de Entrada:", str(entrada)),
+        ("Hora de Salida:", str(salida)),
+        ("Tiempo total:", str(minutos) + " min"),
+        ("Tiempo de gracia:", str(cfg.tiempoGracia) + " min"),
+        ("Tiempo facturable:", str(round(horasFloat, 1)) + " h"),
+        ("Tarifa por hora:", "₡" + str(cfg.montoHora)),
+        ("Tipo de Pago:", tipoPagoNombre),
+    ]
+
+    for etiqueta, valor in filas:
+        pdf.set_x(15)
+        pdf.set_font("Helvetica", "B", 11)
+        pdf.cell(60, 9, etiqueta)
+        pdf.set_font("Helvetica", "", 11)
+        pdf.cell(0, 9, valor)
+        pdf.ln()
+
+    pdf.ln(3)
+    pdf.set_fill_color(240, 240, 240)
+    pdf.set_x(15)
+    pdf.set_font("Helvetica", "B", 14)
+    pdf.cell(175, 12, "TOTAL A PAGAR: ₡" + str(monto), border=1, fill=True)
+    pdf.ln()
+
+    if os.path.exists(rutaQr):  #QR
+        pdf.image(rutaQr, x=140, y=40, w=55)
+
+    pdf.set_font("Helvetica", "I", 9)
+    pdf.set_xy(15, 200)
+    pdf.set_text_color(120, 120, 120)
+    pdf.cell(0, 6, "Gracias por usar nuestro parqueo. Conserve esta factura.")
+
+    pdf.output(rutaPdf)
+
+    if os.path.exists(rutaQr):
+        os.remove(rutaQr)
+
+    return rutaPdf
+
+
+
+
+
+
+
 
 
 
