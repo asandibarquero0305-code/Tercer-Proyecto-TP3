@@ -204,3 +204,34 @@ Evidencia:
 * Generación automática del archivo cierrePorTipoPago.xml.
 * Integración de ambas opciones mediante nuevos botones en la ventana principal del sistema.
 * Pruebas de funcionamiento de la exportación de reportes.
+
+
+Avance #8 Brandon Coronado
+Fecha: 30/06/2026   Hora a la que termino: 11:05 pm
+Integrante: Brandon Coronado
+
+Trabajo realizado:
+
+* Se desarrolló la función crearConfiguracion(), encargada de permitir la modificación de los datos generales del sistema de parqueo.
+* Se agregaron las variables necesarias para manejar el tamaño del estacionamiento, el tiempo de gracia, el monto por hora y la existencia de un espacio para vehículo eléctrico.
+* Se modificó la función crearEstacionamiento() para que los espacios se generen según el tamaño configurado por el usuario.
+* Se incorporó la lógica para calcular los espacios especiales según el 5% del total del estacionamiento, respetando el mínimo de 2 espacios especiales.
+* Se agregó la opción para indicar si el parqueo posee o no espacio para vehículo eléctrico.
+* Se integró la opción de configuración en la ventana principal mediante un botón.
+
+Problemas encontrados:
+
+Se presentaron dudas sobre cómo actualizar el tamaño del parqueo sin afectar el funcionamiento general del sistema ni las listas de espacios ya creadas.
+
+Solución aplicada:
+
+Se decidió reconstruir la lista de espacios cada vez que se actualiza la configuración, utilizando listaEspacios.clear() y luego llamando nuevamente a crearEstacionamiento().
+
+Evidencia:
+
+* Implementación de crearConfiguracion().
+* Modificación de crearEstacionamiento().
+* Validación del tamaño del estacionamiento.
+* Validación del tiempo de gracia.
+* Validación del monto por hora.
+* Integración del botón Configuración en la ventana principal.
