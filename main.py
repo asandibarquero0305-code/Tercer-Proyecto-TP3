@@ -2,6 +2,8 @@ from tkinter import *
 from tkinter import messagebox, simpledialog
 from clases import Vehiculo, Voucher, Espacio
 from datetime import datetime
+import urllib.request
+import json
 
 listaEspacios = []
 listaVehiculos = []
@@ -48,24 +50,62 @@ def crearEstacionamiento():
 
 """
 Funcionalidad:
-Crea algunos vehículos de prueba para poder usar el sistema.
+Obtiene vehículos desde una API utilizando urllib.request y json. La cantidad
+de vehículos se calcula según los espacios generales disponibles del parqueo,
+reservando un 5% de estos para que permanezcan libres.
 
 Entrada:
 No recibe parámetros.
 
 Salida:
-Agrega vehículos a la lista de vehículos.
+Llena la lista de vehículos con la información obtenida desde la API.
 """
 def crearVehiculosYVouchers():
-    vehiculo1 = Vehiculo("ABC123", "Toyota", "Rojo")
-    vehiculo2 = Vehiculo("DEF456", "Hyundai", "Blanco")
-    vehiculo3 = Vehiculo("GHI789", "Nissan", "Negro")
+    listaVehiculos.clear()
 
-    listaVehiculos.append(vehiculo1)
-    listaVehiculos.append(vehiculo2)
-    listaVehiculos.append(vehiculo3)
+    cantidadGenerales = 0
 
-    messagebox.showinfo("Vehículos", "Vehículos obtenidos correctamente.")
+    for espacio in listaEspacios:
+        if espacio.tipo == "General":
+            cantidadGenerales += 1
+
+    espaciosLibresReserva = round(cantidadGenerales * 0.05)
+
+    if espaciosLibresReserva < 1:
+        espaciosLibresReserva = 1
+
+    cantidadVehiculos = cantidadGenerales - espaciosLibresReserva
+
+    try:
+        url = "https://vpic.nhtsa.dot.gov/api/vehicles/getallmanufacturers?format=json"
+
+        respuesta = urllib.request.urlopen(url)
+        datos = json.load(respuesta)
+
+        resultados = datos["Results"]
+
+        for numero in range(cantidadVehiculos):
+            marca = resultados[numero]["Mfr_CommonName"]
+
+            if marca == None:
+                marca = resultados[numero]["Mfr_Name"]
+
+            placa = "API" + str(100 + numero)
+            color = "Color" + str(numero + 1)
+
+            vehiculo = Vehiculo(placa, marca, color)
+            listaVehiculos.append(vehiculo)
+
+        messagebox.showinfo(
+            "Vehículos",
+            "Vehículos obtenidos desde la API correctamente.\nCantidad creada: " + str(len(listaVehiculos))
+        )
+
+    except:
+        messagebox.showwarning(
+            "Error",
+            "No se pudo obtener la información desde la API."
+        )
 
 """
 Funcionalidad:
@@ -622,6 +662,72 @@ def crearConfiguracion():
 
 """
 Funcionalidad:
+Muestra una ventana con la información general del sistema y los
+desarrolladores de la aplicación.
+
+Entrada:
+No recibe parámetros.
+
+Salida:
+Muestra una ventana informativa con los datos del proyecto.
+"""
+def crearAcercaDe():
+    ventana = Toplevel()
+    ventana.title("Acerca de")
+    ventana.geometry("350x250")
+
+    Label(ventana, text="Sistema de Parqueo", font=("Arial", 16)).pack(pady=10)
+    Label(ventana, text="Tarea Programada #3").pack(pady=5)
+    Label(ventana, text="Taller de Programación").pack(pady=5)
+    Label(ventana, text="I Semestre 2026").pack(pady=5)
+
+    Label(ventana, text="Desarrollado por:").pack(pady=5)
+    Label(ventana, text="Estudiante 1: [Tu nombre]").pack()
+    Label(ventana, text="Estudiante 2: [Nombre compañero]").pack()
+
+    Button(ventana, text="Regresar", width=20, command=ventana.destroy).pack(pady=15)
+
+
+
+"""
+Funcionalidad:
+Estaciona automáticamente los vehículos creados en los espacios generales
+disponibles del parqueo.
+
+Entrada:
+No recibe parámetros.
+
+Salida:
+Asigna vehículos a espacios generales libres y crea sus respectivos vouchers.
+"""
+def estacionarVehiculosMasivo():
+    if len(listaVehiculos) == 0:
+        messagebox.showwarning("Error", "Primero debe obtener vehículos.")
+        return
+
+    contadorVehiculos = 0
+
+    for espacio in listaEspacios:
+        if espacio.tipo == "General" and espacio.estado == "Libre":
+            if contadorVehiculos < len(listaVehiculos):
+                vehiculo = listaVehiculos[contadorVehiculos]
+                horaEntrada = datetime.now().strftime("%H:%M")
+                voucher = Voucher(vehiculo.placa, horaEntrada)
+
+                espacio.estacionarVehiculo(vehiculo, voucher)
+                listaVouchers.append(voucher)
+
+                contadorVehiculos += 1
+
+    actualizarVentanaEstacionamiento()
+
+    messagebox.showinfo(
+        "Reserva masiva",
+        "Se estacionaron " + str(contadorVehiculos) + " vehículos automáticamente."
+    )
+
+"""
+Funcionalidad:
 Crea la ventana principal del sistema de parqueo.
 
 Entrada:
@@ -637,10 +743,12 @@ def crearVentanaPrincipal():
     Button(ventana, text="Obtener vehículos", width=30, command=crearVehiculosYVouchers).pack(pady=5)
     Button(ventana, text="Ver estacionamiento", width=30, command=crearVentanaEstacionamiento).pack(pady=5)
     Button(ventana, text="Estacionar vehículo", width=30, command=estacionarVehiculo).pack(pady=5)
+    Button(ventana, text="Estacionar vehículos masivo", width=30, command=estacionarVehiculosMasivo).pack(pady=5)
     Button(ventana, text="Cierre Diario", width=30, command=crearCierreDiario).pack(pady=5)
     Button(ventana, text="Exportar cierre diario a CSV", width=30, command=exportarCierreCSV).pack(pady=5)
     Button(ventana, text="Configuración", width=30, command=crearConfiguracion).pack(pady=5)
     Button(ventana, text="Cierre por tipo de pago XML", width=30, command=crearCierreXML).pack(pady=5)
+    Button(ventana, text="Acerca de", width=30, command=crearAcercaDe).pack(pady=5)
     Button(ventana, text="Salir", width=30, command=ventana.destroy).pack(pady=5)
 
     ventana.mainloop()

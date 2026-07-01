@@ -235,3 +235,31 @@ Evidencia:
 * Validación del tiempo de gracia.
 * Validación del monto por hora.
 * Integración del botón Configuración en la ventana principal.
+
+Avance #9 Brandon Coronado
+Fecha: 01/07/2026  Hora a la que termino: 3:17pm
+Integrante: Brandon Coronado
+
+Trabajo realizado:
+
+* Se completó el desarrollo de la ventana Acerca de, incorporando la información general del sistema, el curso y los integrantes del proyecto, además de una opción para regresar a la ventana principal.
+* Durante la revisión final de los requerimientos de la tarea programada se identificó que el apartado Obtener vehículos debía solicitar la información desde una API, requisito que inicialmente había sido pasado por alto durante el desarrollo de esta funcionalidad.
+* Se investigó la forma de consumir una API utilizando únicamente las librerías estándar de Python, evitando el uso de librerías externas no vistas durante el curso.
+* Se incorporaron las librerías urllib.request y json, las cuales permiten establecer la conexión con la API y procesar la información recibida en formato JSON.
+* Se modificó la función crearVehiculosYVouchers() para obtener la información de los vehículos desde la API y generar dinámicamente los objetos de tipo Vehiculo según la cantidad de espacios generales disponibles en el estacionamiento.
+
+Problemas encontrados:
+
+Durante la revisión del proyecto se detectó que la implementación inicial de la función Obtener vehículos utilizaba datos generados manualmente, lo cual no cumplía completamente con el requerimiento establecido en la tarea programada de consumir la información desde una API. Además, surgieron dudas sobre el uso de librerías externas, ya que no forman parte de los contenidos vistos durante el curso.
+
+Solución aplicada:
+
+Se investigó una alternativa utilizando únicamente las librerías incluidas por defecto en Python (urllib.request y json), lo que permitió realizar la consulta a la API sin necesidad de instalar componentes adicionales y manteniendo la solución acorde con el nivel y los lineamientos del curso.
+
+Evidencia:
+
+* Implementación de la ventana Acerca de.
+* Investigación sobre el consumo de APIs utilizando librerías estándar de Python.
+* Incorporación de las librerías urllib.request y json.
+* Modificación de la función crearVehiculosYVouchers() para obtener la información desde una API.
+* Generación dinámica de vehículos según la capacidad configurada del estacionamiento.
