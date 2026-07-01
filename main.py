@@ -11,12 +11,15 @@ listaBotonesEspacios = []
 
 montoPorHora = 1000
 tiempoGracia = 15
+tiempoEstacionamiento=20
+tieneElectrico=True
 
 montoPorHora = 1000
 
 """
 Funcionalidad:
-Crea los espacios iniciales del estacionamiento.
+Crea los espacios iniciales del estacionamiento tomando en cuenta
+el tamaño configurado, los espacios especiales y el espacio eléctrico.
 
 Entrada:
 No recibe parámetros.
@@ -25,10 +28,17 @@ Salida:
 Llena la lista de espacios con objetos de tipo Espacio.
 """
 def crearEstacionamiento():
-    for numero in range(1, 21):
-        if numero == 1 or numero == 2:
+    listaEspacios.clear()
+
+    cantidadEspeciales = round(tamanoEstacionamiento * 0.05)
+
+    if cantidadEspeciales < 2:
+        cantidadEspeciales = 2
+
+    for numero in range(1, tamanoEstacionamiento + 1):
+        if numero <= cantidadEspeciales:
             tipo = "Especial"
-        elif numero == 3:
+        elif tieneElectrico == True and numero == cantidadEspeciales + 1:
             tipo = "Electrico"
         else:
             tipo = "General"
@@ -517,6 +527,99 @@ def crearCierreXML():
     messagebox.showinfo("XML", "Archivo cierrePorTipoPago.xml creado correctamente.")
 
 
+
+"""
+Funcionalidad:
+Permite modificar la configuración general del parqueo: tamaño del
+estacionamiento, tiempo de gracia, monto por hora y espacio eléctrico.
+
+Entrada:
+No recibe parámetros directamente.
+Solicita datos mediante ventanas emergentes.
+
+Salida:
+Actualiza la configuración y vuelve a crear los espacios del parqueo.
+"""
+def crearConfiguracion():
+    global montoPorHora
+    global tiempoGracia
+    global tamanoEstacionamiento
+    global tieneElectrico
+
+    confirmar = messagebox.askyesno(
+        "Configuración",
+        "¿Desea modificar la configuración del parqueo?"
+    )
+
+    if confirmar == False:
+        return
+
+    nuevoTamano = simpledialog.askinteger(
+        "Configuración",
+        "Digite el tamaño del estacionamiento:"
+    )
+
+    nuevoTiempo = simpledialog.askinteger(
+        "Configuración",
+        "Digite el tiempo de gracia en minutos:"
+    )
+
+    nuevoMonto = simpledialog.askinteger(
+        "Configuración",
+        "Digite el monto por hora:"
+    )
+
+    respuestaElectrico = simpledialog.askstring(
+        "Configuración",
+        "¿El estacionamiento tiene espacio para vehículo eléctrico? si/no:"
+    )
+
+    if nuevoTamano != None:
+        if nuevoTamano >= 3:
+            tamanoEstacionamiento = nuevoTamano
+        else:
+            messagebox.showwarning("Error", "El tamaño mínimo debe ser 3.")
+
+    if nuevoTiempo != None:
+        if nuevoTiempo >= 0:
+            tiempoGracia = nuevoTiempo
+        else:
+            messagebox.showwarning("Error", "El tiempo de gracia no puede ser negativo.")
+
+    if nuevoMonto != None:
+        if nuevoMonto >= 0:
+            montoPorHora = nuevoMonto
+        else:
+            messagebox.showwarning("Error", "El monto por hora no puede ser negativo.")
+
+    if respuestaElectrico != None:
+        respuestaElectrico = respuestaElectrico.lower()
+
+        if respuestaElectrico == "si":
+            tieneElectrico = True
+        elif respuestaElectrico == "no":
+            tieneElectrico = False
+        else:
+            messagebox.showwarning(
+                "Error",
+                "Respuesta inválida para espacio eléctrico. Se mantiene el valor anterior."
+            )
+
+    crearEstacionamiento()
+    actualizarVentanaEstacionamiento()
+
+    mensaje = "Configuración actualizada correctamente."
+    mensaje += "\nTamaño del estacionamiento: " + str(tamanoEstacionamiento)
+    mensaje += "\nTiempo de gracia: " + str(tiempoGracia)
+    mensaje += "\nMonto por hora: " + str(montoPorHora)
+
+    if tieneElectrico == True:
+        mensaje += "\nEspacio eléctrico: Sí"
+    else:
+        mensaje += "\nEspacio eléctrico: No"
+
+    messagebox.showinfo("Configuración", mensaje)
+
 """
 Funcionalidad:
 Crea la ventana principal del sistema de parqueo.
@@ -536,6 +639,7 @@ def crearVentanaPrincipal():
     Button(ventana, text="Estacionar vehículo", width=30, command=estacionarVehiculo).pack(pady=5)
     Button(ventana, text="Cierre Diario", width=30, command=crearCierreDiario).pack(pady=5)
     Button(ventana, text="Exportar cierre diario a CSV", width=30, command=exportarCierreCSV).pack(pady=5)
+    Button(ventana, text="Configuración", width=30, command=crearConfiguracion).pack(pady=5)
     Button(ventana, text="Cierre por tipo de pago XML", width=30, command=crearCierreXML).pack(pady=5)
     Button(ventana, text="Salir", width=30, command=ventana.destroy).pack(pady=5)
 
