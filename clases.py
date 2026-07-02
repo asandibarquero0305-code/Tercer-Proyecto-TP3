@@ -857,6 +857,370 @@ def crearFacturaPdf(obj, cfg):
     return rutaPdf
 
 
+def generarReporteCierreDiarioHtml(lista):
+    """
+    Funcionalidad:
+    Genera el reporte de cierre diario en formato HTML,
+    subtotales por tipo de pago y total general. Abre el archivo en el navegador.
+    Entrada: lista (list): Lista de objetos Estacionamiento del dia.
+    Salida: rutaHtml (str): Ruta del archivo HTML generado.
+    """
+
+    hoy = datetime.now().strftime("%d/%m/%Y")
+    rutaHtml = "cierre_diario_" + datetime.now().strftime("%d-%m-%Y") + ".html"
+
+    totalesPorTipo = {1: 0.0, 2: 0.0, 3: 0.0}
+    totalGeneral = 0.0
+
+    filas = ""
+    for obj in lista:
+        placa, marca, color, tipo = obj.info
+        ubicacion, entrada, salida = obj.estadia
+        monto, tipoPago = obj.pago
+        if isinstance(marca, int) and 1 <= marca <= len(MARCAS):
+            marcaNombre = MARCAS[marca - 1]
+        else:
+            marcaNombre = str(marca)
+        tipoPagoNombre = TIPOS_PAGO.get(tipoPago, str(tipoPago))
+        totalesPorTipo[tipoPago] = totalesPorTipo.get(tipoPago, 0) + monto
+        totalGeneral += monto
+        filas += """
+        <tr>
+            <td>{}</td>
+            <td>{}</td>
+            <td>{}</td>
+            <td>{}</td>
+            <td>{}</td>
+            <td class="monto">₡{:,.0f}</td>
+        </tr>""".format(ubicacion, placa, entrada, salida, tipoPagoNombre, monto)
+
+    subtotales = ""
+    for tp, nombre in TIPOS_PAGO.items():
+        subtotales += """
+        <div class="subtotal-bloque">
+            <span class="subtotal-etiqueta">{}</span>
+            <span class="subtotal-valor">₡{:,.0f}</span>
+        </div>""".format(nombre, totalesPorTipo.get(tp, 0))
+
+    html = """<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Cierre Diario - {fecha}</title>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            background: #f0f4f8;
+            margin: 0;
+            padding: 20px;
+            color: #222;
+        }}
+        /* --- 3 tamanos de letra --- */
+        h1 {{ font-size: 28px; color: #1a3a6b; }}  /* grande / azul */
+        h2 {{ font-size: 18px; color: #2e7d32; }}  /* mediano / verde */
+        p.fecha {{ font-size: 13px; color: #888; }} /* pequeno / gris */
+
+        header {{
+            background: #1a3a6b;
+            color: white;
+            padding: 18px 28px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }}
+        header h1 {{ color: white; margin: 0; }}
+        header p {{ margin: 4px 0 0; font-size: 14px; opacity: 0.85; }}
+
+        table {{
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }}
+        thead tr {{
+            background: #1a3a6b;  /* azul - color 1 */
+            color: white;
+        }}
+        th {{ padding: 11px 14px; text-align: left; font-size: 13px; }}
+        td {{ padding: 9px 14px; font-size: 13px; border-bottom: 1px solid #eee; }}
+        tr:nth-child(even) {{ background: #f7f9fc; }}
+        .monto {{ color: #2e7d32; font-weight: bold; }} /* verde - color 2 */
+
+        .resumen {{
+            margin-top: 28px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }}
+        .subtotal-bloque {{
+            background: white;
+            border-left: 5px solid #2e7d32;
+            padding: 12px 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+            min-width: 200px;
+        }}
+        .subtotal-etiqueta {{ display: block; font-size: 13px; color: #555; }}
+        .subtotal-valor {{ display: block; font-size: 20px; font-weight: bold; color: #1a3a6b; }}
+
+        .total-general {{
+            margin-top: 18px;
+            background: #1a3a6b;
+            color: white;
+            padding: 14px 24px;
+            border-radius: 8px;
+            display: inline-block;
+        }}
+        .total-general span {{
+            font-size: 22px;   /* tercer tamano de letra */
+            font-weight: bold;
+            color: #f9c74f;    /* amarillo - color 3 */
+        }}
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Cierre Diario - Parqueo TEC</h1>
+        <p>Fecha: {fecha} &nbsp;|&nbsp; Generado: {hora}</p>
+    </header>
+
+    <h2>Detalle de Transacciones</h2>
+    <p class="fecha">Total de registros: {cantidad}</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Ubicacion</th>
+                <th>Placa</th>
+                <th>Hora Entrada</th>
+                <th>Hora Salida</th>
+                <th>Tipo de Pago</th>
+                <th>Monto</th>
+            </tr>
+        </thead>
+        <tbody>
+            {filas}
+        </tbody>
+    </table>
+
+    <div class="resumen">
+        {subtotales}
+    </div>
+
+    <div class="total-general">
+        Total recaudado del dia: <span>₡{total:,.0f}</span>
+    </div>
+</body>
+</html>""".format(
+        fecha=hoy,
+        hora=datetime.now().strftime("%H:%M:%S"),
+        cantidad=len(lista),
+        filas=filas,
+        subtotales=subtotales,
+        total=totalGeneral
+    )
+
+    with open(rutaHtml, "w", encoding="utf-8") as f:
+        f.write(html)
+
+    webbrowser.open("file:///" + os.path.abspath(rutaHtml))
+    return rutaHtml
+
+
+def generarCierrePorTipoXml(lista):
+    """
+    Funcionalidad:
+    Genera el archivo XML de cierre por tipo de pago con 3 secciones:
+    efectivo, sinpe y tarjeta. Almacena informacion completa de cada objeto.
+    Entrada: lista (list): Lista de objetos Estacionamiento a exportar.
+    Salida: rutaXml (str): Ruta del archivo XML generado.
+    """
+
+    rutaXml = "cierre_tipo_pago_" + datetime.now().strftime("%d-%m-%Y") + ".xml"
+
+    grupos = {1: [], 2: [], 3: []}
+    for obj in lista:
+        tp = obj.pago[1]
+        grupos[tp].append(obj)
+
+    def objetoAXml(obj, indent="        "):
+        placa, marca, color, tipo = obj.info
+        ubicacion, entrada, salida = obj.estadia
+        monto, tipoPago = obj.pago
+        if isinstance(marca, int) and 1 <= marca <= len(MARCAS):
+            marcaNombre = MARCAS[marca - 1]
+        else:
+            marcaNombre = str(marca)
+        if isinstance(color, int) and 1 <= color <= len(COLORES):
+            colorNombre = COLORES[color - 1]
+        else:
+            colorNombre = str(color)
+        if isinstance(tipo, int) and 1 <= tipo <= len(TIPOS):
+            tipoNombre = TIPOS[tipo - 1]
+        else:
+            tipoNombre = str(tipo)
+        return (
+            "{}<vehiculo>\n"
+            "{}    <id>{}</id>\n"
+            "{}    <placa>{}</placa>\n"
+            "{}    <marca>{}</marca>\n"
+            "{}    <color>{}</color>\n"
+            "{}    <tipo>{}</tipo>\n"
+            "{}    <ubicacion>{}</ubicacion>\n"
+            "{}    <entrada>{}</entrada>\n"
+            "{}    <salida>{}</salida>\n"
+            "{}    <monto>{}</monto>\n"
+            "{}    <tipoPago>{}</tipoPago>\n"
+            "{}</vehiculo>\n"
+        ).format(
+            indent, indent, obj.id,
+            indent, placa, indent, marcaNombre,
+            indent, colorNombre, indent, tipoNombre,
+            indent, ubicacion, indent, entrada,
+            indent, salida, indent, monto,
+            indent, TIPOS_PAGO.get(tipoPago, str(tipoPago)),
+            indent
+        )
+
+    lineas = ['<?xml version="1.0" encoding="UTF-8"?>', "<cierrePorTipoPago>"]
+
+    for nombreSeccion, claveNum in [("efectivo", 1), ("sinpe", 2), ("tarjeta", 3)]:
+        lineas.append("    <{}>".format(nombreSeccion))
+        for obj in grupos[claveNum]:
+            lineas.append(objetoAXml(obj))
+        lineas.append("    </{}>".format(nombreSeccion))
+
+    lineas.append("</cierrePorTipoPago>")
+
+    with open(rutaXml, "w", encoding="utf-8") as f:
+        f.write("\n".join(lineas))
+
+    return rutaXml
+
+
+def exportarCierroCsv(lista):
+    """
+    Funcionalidad: Exporta los datos del cierre diario a un archivo CSV sin encabezados, listo para abrir en Excel. 
+    Columnas: ubicacion, placa, entrada, salida, tipo de pago, monto.
+    Entrada: lista (list): Lista de objetos Estacionamiento a exportar.
+    Salida: rutaCsv (str): Ruta del archivo CSV generado.
+    """
+    rutaCsv = "cierre_diario_" + datetime.now().strftime("%d-%m-%Y") + ".csv"
+
+    with open(rutaCsv, "w", newline="", encoding="utf-8") as f:
+        escritor = csv.writer(f)
+        for obj in lista:
+            placa, marca, color, tipo = obj.info
+            ubicacion, entrada, salida = obj.estadia
+            monto, tipoPago = obj.pago
+            escritor.writerow([ubicacion, placa, entrada, salida,
+                                TIPOS_PAGO.get(tipoPago, str(tipoPago)), monto])
+
+    return rutaCsv
+
+def abrirVentanaReportes(ventanaPadre):
+    """
+    Funcionalidad: Abre la ventana de reportes con tres opciones: cierre diario (HTML), cierre por tipo de pago (XML) y exportar CSV.
+    Entrada: ventanaPadre (tk.Tk): Ventana principal de la aplicacion.
+    Salida: No retorna valor. Abre una ventana Toplevel con los botones de reporte.
+    """
+    ventana = tk.Toplevel(ventanaPadre)
+    ventana.title("Reportes")
+    ventana.geometry("360x310")
+    ventana.resizable(False, False)
+    ventana.grab_set()
+
+    tk.Label(ventana, text="Reportes del Parqueo",
+             font=("Arial", 14, "bold")).pack(pady=14)
+
+    def cierreDiario():
+        """
+        Funcionalidad: Ejecuta el cierre diario: cierra vehiculos pendientes, genera el reporte HTML y lo abre en el navegador.
+        Entrada: No recibe parametros.
+        Salida: No retorna valor. Genera el HTML y lo abre en el navegador.
+        """
+        cfg = cargarConfiguracion()
+        if not cfg:
+            messagebox.showerror("Error", "No hay configuracion del parqueo.", parent=ventana)
+            return
+
+        lista = cargarBD()
+        if not lista:
+            messagebox.showinfo("Info", "No hay vehiculos registrados.", parent=ventana)
+            return
+
+        pendientes = [o for o in lista if o.estadia[2] == "" or o.estadia[2] is None]
+        tiposPago = [1, 2, 3]
+        ahoraMismo = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        for obj in pendientes:
+            tipoPago = random.choice(tiposPago)
+            monto = calcularMonto(obj.estadia[1], ahoraMismo, cfg)
+            obj.estadia[2] = ahoraMismo
+            obj.pago = (monto, tipoPago)
+            crearFacturaPdf(obj, cfg)
+
+        guardarBD(lista)
+        rutaHtml = generarReporteCierreDiarioHtml(lista)
+        messagebox.showinfo("Cierre Diario",
+            "Cierre generado exitosamente.\nArchivo: {}".format(rutaHtml), parent=ventana)
+
+    def cierrePorTipo():
+        """
+        Funcionalidad: Genera el archivo XML de cierre por tipo de pago (efectivo, SINPE, tarjeta).
+        Entrada: No recibe parametros.
+        Salida: No retorna valor. Genera el XML en la carpeta actual.
+        """
+        lista = cargarBD()
+        if not lista:
+            messagebox.showinfo("Info", "No hay vehiculos registrados.", parent=ventana)
+            return
+
+        pagados = [o for o in lista if o.pago[1] != 0]
+        if not pagados:
+            messagebox.showinfo("Info", "No hay vehiculos con pago registrado.", parent=ventana)
+            return
+
+        rutaXml = generarCierrePorTipoXml(pagados)
+        messagebox.showinfo("Cierre por Tipo de Pago",
+            "XML generado:\n{}".format(rutaXml), parent=ventana)
+
+    def exportarCsv():
+        """
+        Funcionalidad: Exporta el cierre diario completo a un archivo CSV sin encabezados.
+        Entrada: No recibe parametros.
+        Salida: No retorna valor. Genera el CSV en la carpeta actual.
+        """
+        lista = cargarBD()
+        if not lista:
+            messagebox.showinfo("Info", "No hay vehiculos registrados.", parent=ventana)
+            return
+
+        rutaCsv = exportarCierroCsv(lista)
+        messagebox.showinfo("Exportar CSV",
+            "CSV generado exitosamente:\n{}".format(rutaCsv), parent=ventana)
+
+    tk.Button(ventana, text="a. Cierre Diario y Facturacion en Masa",
+              command=cierreDiario, bg="#1a3a6b", fg="white",
+              font=("Arial", 10, "bold"), width=32, height=2).pack(pady=8)
+
+    tk.Button(ventana, text="b. Cierre por Tipo de Pago (XML)",
+              command=cierrePorTipo, bg="#27ae60", fg="white",
+              font=("Arial", 10, "bold"), width=32, height=2).pack(pady=8)
+
+    tk.Button(ventana, text="c. Exportar Cierre Diario a CSV",
+              command=exportarCsv, bg="#e67e22", fg="white",
+              font=("Arial", 10, "bold"), width=32, height=2).pack(pady=8)
+
+    tk.Button(ventana, text="Regresar", command=ventana.destroy,
+              bg="#7f8c8d", fg="white", font=("Arial", 10)).pack(pady=6)
+
+
+
+
+
+
 
 
 
