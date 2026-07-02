@@ -2,9 +2,6 @@
 #Ultimo avance: 6-26-2026
 #Ultimo avance Brandon Coronado: 6-27-2026
 
-
-
-
 class Configuracion:
     """
     Funcionalidad: Guarda la configuracion general del estacionamiento.
@@ -34,7 +31,7 @@ class Estacionamiento:
 
 MARCAS = [
     "Toyota", "Hyundai", "Kia", "Honda", "Nissan",
-    "Mazda", "Chevrolet", "Ford", "Mitsubishi", "Suzuki"
+    "Mazda", "Chevrolet", "Ford", "Mitsubishi", "Suzuki", "Otro"
 ]
 
 COLORES = [
@@ -54,147 +51,155 @@ ARCHIVO_CONFIG = "configuracion.pkl"
 
 class Vehiculo:
 
-    """
-    Funcionalidad:
-    Inicializa un objeto de tipo Vehiculo con sus datos principales.
-
-    Entrada:
-    placa: placa del vehículo.
-    marca: marca del vehículo.
-    color: color del vehículo.
-
-    Salida:
-    Crea un objeto Vehiculo.
-    """
     def __init__(self, placa, marca, color):
+        """
+        Funcionalidad:
+        Inicializa un objeto de tipo Vehiculo con sus datos principales.
+
+        Entrada:
+        placa: placa del vehículo.
+        marca: marca del vehículo.
+        color: color del vehículo.
+
+        Salida:
+        Crea un objeto Vehiculo.
+        """
         self.placa = placa
         self.marca = marca
         self.color = color
 
-    """
-    Funcionalidad:
-    Obtiene los datos principales del vehículo.
-
-    Entrada:
-    No recibe parametros.
-
-    Salida:
-    Retorna la placa, marca y color del vehículo.
-    """
+    
     def obtenerDatosVehiculo(self):
+        """
+        Funcionalidad:
+        Obtiene los datos principales del vehículo.
+
+        Entrada:
+        No recibe parametros.
+
+        Salida:
+        Retorna la placa, marca y color del vehículo.
+        """
         return self.placa, self.marca, self.color
 
 class Voucher:
 
-    """
-    Funcionalidad:
-    Inicializa un objeto de tipo Voucher con la placa y hora de entrada.
+    
+    def __init__(self, placa, horaEntrada):
+        """
+        Funcionalidad:
+        Inicializa un objeto de tipo Voucher con la placa y hora de entrada.
 
-    Entrada:
-    placa: placa del vehículo.
-    horaEntrada: hora en que ingresa el vehículo.
+        Entrada:
+        placa: placa del vehículo.
+        horaEntrada: hora en que ingresa el vehículo.
 
-    Salida:
-    Crea un objeto Voucher.
-    """
-    def _init_(self, placa, horaEntrada):
+        Salida:
+        Crea un objeto Voucher.
+        """
         self.placa = placa
         self.horaEntrada = horaEntrada
         self.horaSalida = ""
         self.tipoPago = ""
         self.monto = 0
 
-    """
-    Funcionalidad:
-    Asigna los datos de salida y pago al voucher.
-
-    Entrada:
-    horaSalida: hora en que sale el vehículo.
-    tipoPago: forma de pago utilizada.
-    monto: monto total a pagar.
-
-    Salida:
-    No retorna ningún valor.
-    """
+    
     def asignarSalida(self, horaSalida, tipoPago, monto):
+        """
+        Funcionalidad:
+        Asigna los datos de salida y pago al voucher.
+
+        Entrada:
+        horaSalida: hora en que sale el vehículo.
+        tipoPago: forma de pago utilizada.
+        monto: monto total a pagar.
+
+        Salida:
+        No retorna ningún valor.
+        """
         self.horaSalida = horaSalida
         self.tipoPago = tipoPago
         self.monto = monto
 
-    """
-    Funcionalidad:
-    Obtiene los datos guardados en el voucher.
-
-    Entrada:
-    No recibe parámetros.
-
-    Salida:
-    Retorna placa, hora de entrada, hora de salida, tipo de pago y monto.
-    """
+    
     def obtenerDatosVoucher(self):
+        """
+        Funcionalidad:
+        Obtiene los datos guardados en el voucher.
+
+        Entrada:
+        No recibe parámetros.
+
+        Salida:
+        Retorna placa, hora de entrada, hora de salida, tipo de pago y monto.
+        """
         return self.placa, self.horaEntrada, self.horaSalida, self.tipoPago, self.monto
     
 
 class Espacio:
 
-    """
-    Funcionalidad:
-    Inicializa un objeto de tipo Espacio.
+    
+    def __init__(self, numero, tipo):
+        """
+        Funcionalidad:
+        Inicializa un objeto de tipo Espacio.
 
-    Entrada:
-    numero: número del espacio de parqueo.
-    tipo: tipo de espacio.
+        Entrada:
+        numero: número del espacio de parqueo.
+        tipo: tipo de espacio.
 
-    Salida:
-    Crea un objeto Espacio en estado libre.
-    """
-    def _init_(self, numero, tipo):
+        Salida:
+        Crea un objeto Espacio en estado libre.
+        """
         self.numero = numero
         self.tipo = tipo
         self.estado = "Libre"
         self.vehiculo = None
         self.voucher = None
 
-    """
-    Funcionalidad:
-    Asigna un vehículo y su voucher al espacio.
-
-    Entrada:
-    vehiculo: objeto de tipo Vehiculo.
-    voucher: objeto de tipo Voucher.
-
-    Salida:
-    No retorna ningún valor.
-    """
+    
     def estacionarVehiculo(self, vehiculo, voucher):
+        """
+        Funcionalidad:
+        Asigna un vehículo y su voucher al espacio.
+
+        Entrada:
+        vehiculo: objeto de tipo Vehiculo.
+        voucher: objeto de tipo Voucher.
+
+        Salida:
+        No retorna ningún valor.
+        """
         self.vehiculo = vehiculo
         self.voucher = voucher
         self.estado = "Ocupado"
 
-    """
-    Funcionalidad:
-    Libera el espacio de parqueo.
-
-    Entrada:
-    No recibe parámetros.
-
-    Salida:
-    El espacio queda libre nuevamente.
-    """
+    
     def liberarEspacio(self):
+        """
+        Funcionalidad:
+        Libera el espacio de parqueo.
+
+        Entrada:
+        No recibe parámetros.
+
+        Salida:
+        El espacio queda libre nuevamente.
+        """
         self.vehiculo = None
         self.voucher = None
         self.estado = "Libre"
 
-    """
-    Funcionalidad:
-    Obtiene los datos básicos del espacio.
-
-    Entrada:
-    No recibe parámetros.
-
-    Salida:
-    Retorna número, tipo y estado del espacio.
-    """
+    
     def obtenerDatosEspacio(self):
+        """
+        Funcionalidad:
+        Obtiene los datos básicos del espacio.
+
+        Entrada:
+        No recibe parámetros.
+
+        Salida:
+        Retorna número, tipo y estado del espacio.
+        """
         return self.numero, self.tipo, self.estado
