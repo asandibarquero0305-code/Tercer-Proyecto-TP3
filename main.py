@@ -1,4 +1,3 @@
-from funciones import crearEstacionamiento, crearVentanaPrincipal
+from funciones import iniciarAplicacion
 
-crearEstacionamiento()
-crearVentanaPrincipal()
+iniciarAplicacion()
