@@ -1,2 +1,244 @@
-# Tercer-Proyecto-TP3
-Tercer Proyecto TP3
+Avance #1 Aaron Sandi 
+
+Fecha: 26/06/2026  
+Integrante: Aaron Sandi 
+
+Trabajo realizado: 
+* Realicé una lectura completa de la Tarea Programada #3 para comprender el funcionamiento general del sistema de parqueo y los requerimientos solicitados.  
+* Analicé específicamente las responsabilidades asignadas al Estudiante 2 (E2), identificando las funciones y módulos que debía desarrollar durante el proyecto.  
+* Revisé nuevamente el material proporcionado por la profesora sobre Programación Orientada a Objetos, haciendo énfasis en la creación de clases, objetos, persistencia de datos y organización del código en diferentes módulos.  
+
+Problemas encontrados: 
+* Al inicio fue necesario comprender cómo se comunicaría la parte correspondiente al Estudiante 2 con las funciones desarrolladas por el Estudiante 1, especialmente en lo relacionado con el intercambio de información entre ambos módulos. 
+
+Solución aplicada: 
+* Se realizó una segunda lectura del apartado donde se distribuyen las responsabilidades entre ambos integrantes y se elaboró una lista con todas las funciones correspondientes al E2, permitiendo organizar el desarrollo del proyecto antes de iniciar la programación. 
+
+Evidencia: 
+* Lectura y análisis completo de la Tarea Programada #3.  
+* Revisión del material de Programación Orientada a Objetos proporcionado por la profesora.  
+* Organización inicial de las responsabilidades correspondientes al Estudiante 2.  
+* Planificación de las funciones y módulos que serían desarrollados durante el proyecto. 
+ 
+
+Avance #2 Aaron Sandi 
+
+Fecha: 27/06/2026  
+Integrante: Aaron Sandi 
+
+Trabajo realizado: 
+* Se inició el desarrollo de la parte correspondiente al E2 del proyecto.  
+* Se crearon las clases Configuracion y Estacionamiento, las cuales almacenan la información general del sistema y de cada vehículo registrado.  
+* Se definieron los atributos necesarios para ambas clases según el enunciado.  
+* Se implementaron las funciones cargarConfiguracion(), guardarConfiguracion(), cargarBD() y guardarBD(), encargadas de manejar la persistencia de la información utilizando archivos .pkl.  
+* Se agregaron las constantes necesarias para almacenar marcas, colores, tipos de vehículo, tipos de pago y nombres de archivos utilizados por el sistema.  
+
+Problemas encontrados: 
+* Durante el desarrollo surgieron dudas sobre la forma correcta de guardar y recuperar objetos utilizando archivos binarios. 
+
+Solución aplicada: 
+* Se investigó el funcionamiento de la librería pickle y se implementaron funciones independientes para guardar y cargar tanto la configuración como la base de datos del sistema. 
+
+Evidencia: 
+* Clase Configuracion.  
+* Clase Estacionamiento.  
+* Función cargarConfiguracion().  
+* Función guardarConfiguracion().  
+* Función cargarBD().  
+* Función guardarBD().  
+ 
+
+Avance #3 Aaron Sandi 
+
+Fecha: 28/06/2026 
+Integrante: Aaron Sandi 
+
+Trabajo realizado: 
+* Se implementó la lógica necesaria para calcular la distribución de espacios del parqueo.  
+* Se desarrolló la función calcularEspeciales(), encargada de determinar la cantidad de espacios especiales requeridos.  
+* Se implementó la función calcularTopeMaximoMasivo(), la cual calcula la cantidad máxima de espacios generales que pueden ocuparse respetando los porcentajes establecidos.  
+* Se desarrolló la función generarIdsEspacios(), encargada de generar automáticamente los identificadores de todos los espacios del parqueo.  
+
+Problemas encontrados: 
+* Fue necesario analizar la distribución de espacios especiales, generales y eléctricos respetando las condiciones establecidas en el enunciado. 
+
+Solución aplicada: 
+* Se realizaron cálculos para determinar automáticamente la cantidad de espacios de cada tipo y posteriormente se generaron sus identificadores correspondientes. 
+
+Evidencia: 
+* Función calcularEspeciales().  
+* Función calcularTopeMaximoMasivo().  
+* Función generarIdsEspacios().  
+ 
+
+Avance #4 Aaron Sandi 
+
+Fecha: 28/06/2026  
+Integrante: Aaron Sandi 
+
+Trabajo realizado: 
+* Se inició el desarrollo de la configuración gráfica del sistema.  
+* Se implementó la función abrirVentanaConfiguracion().  
+* Se agregó la interfaz necesaria para ingresar el tamaño del parqueo, tiempo de gracia, monto por hora y existencia de espacio eléctrico.  
+* Se implementó la validación de los datos ingresados antes de almacenarlos.  
+* Se agregó la actualización de la configuración cuando ya existe una configuración guardada.  
+
+Problemas encontrados: 
+* Fue necesario validar correctamente los datos ingresados por el usuario para evitar configuraciones inválidas. 
+
+Solución aplicada: 
+* Se agregaron validaciones antes de guardar la información y mensajes de confirmación cuando la configuración ya existía. 
+
+Evidencia: 
+* Función abrirVentanaConfiguracion().  
+* Validación de datos.  
+* Actualización de configuración.  
+ 
+
+Avance #5 Aaron Sandi 
+
+Fecha: 29/06/2026 
+Integrante: Aaron Sandi 
+
+Trabajo realizado: 
+* Se desarrolló la visualización gráfica del estacionamiento.  
+* Se implementó la generación dinámica de la cuadrícula de espacios.  
+* Se agregó la actualización automática del color de cada espacio dependiendo de si se encuentra libre u ocupado.  
+* Se implementó la identificación visual de espacios especiales, eléctricos y generales.  
+
+Problemas encontrados: 
+* Fue necesario organizar correctamente la distribución de los espacios dentro de la interfaz gráfica. 
+
+Solución aplicada: 
+* Se utilizaron estructuras de repetición para generar automáticamente todos los espacios y actualizar su estado visual. 
+
+Evidencia: 
+* Generación automática de la cuadrícula.  
+* Actualización de colores.  
+* Identificación de espacios.  
+
+
+Avance #6 Aaron Sandi 
+
+Fecha: 29/06/2026 
+Integrante: Aaron Sandi 
+
+Trabajo realizado: 
+* Se desarrolló la lógica necesaria para generar los vouchers y facturas del sistema.  
+* Se implementó la función calcularMonto().  
+* Se desarrolló la función generarCodigoQR().  
+* Se implementaron las funciones generarNombreVoucher() y generarNombreFactura().  
+* Se inició la creación automática de archivos PDF.  
+
+Problemas encontrados: 
+* Fue necesario investigar la generación de códigos QR y la creación automática de documentos PDF. 
+
+Solución aplicada: 
+* Se utilizaron las librerías correspondientes para generar automáticamente los códigos QR y los archivos PDF requeridos por el proyecto. 
+
+Evidencia: 
+* Función calcularMonto().  
+* Función generarCodigoQR().  
+* Función generarNombreVoucher().  
+* Función generarNombreFactura().  
+ 
+
+Avance #7 Aaron Sandi 
+
+Fecha: 30/06/2026 
+Integrante: Aaron Sandi 
+
+Trabajo realizado: 
+* Se completó la implementación de la función crearVoucherPdf().  
+* Se desarrolló la función crearFacturaPdf().  
+* Se integró la generación automática de los códigos QR dentro de ambos documentos.  
+* Se verificó la correcta creación de los archivos PDF.  
+
+Problemas encontrados: 
+* Fue necesario organizar la información para que el contenido del PDF coincidiera con el formato solicitado. 
+
+Solución aplicada: 
+* Se estructuró la información antes de enviarla al documento PDF y se realizaron pruebas de generación automática. 
+
+Evidencia: 
+* Función crearVoucherPdf().  
+* Función crearFacturaPdf().  
+* Generación automática de vouchers.  
+* Generación automática de facturas.  
+ 
+
+Avance #8 Aaron Sandi 
+
+Fecha: 30/06/2026 
+Integrante: Aaron Sandi 
+
+Trabajo realizado: 
+* Se desarrolló la generación de reportes del sistema.  
+* Se implementó el reporte HTML.  
+* Se implementó el reporte XML.  
+* Se desarrolló la exportación del cierre diario en formato CSV.  
+* Se agregaron las opciones correspondientes dentro de la interfaz gráfica.  
+
+Problemas encontrados: 
+* Fue necesario organizar correctamente la información para que pudiera exportarse en los diferentes formatos solicitados. 
+
+Solución aplicada: 
+* Se recorrió la base de datos del sistema generando automáticamente los archivos correspondientes. 
+
+Evidencia: 
+* Reporte HTML.  
+* Reporte XML.  
+* Exportación CSV.  
+* Integración con la interfaz.  
+ 
+
+Avance #9 Aaron Sandi 
+
+Fecha: 1/07/2026  
+Integrante: Aaron Sandi 
+
+Trabajo realizado: 
+* Se desarrolló la ventana principal del sistema.  
+* Se implementó el menú principal con todas las opciones correspondientes al E2.  
+* Se desarrolló la ventana Acerca de.  
+* Se realizaron mejoras generales en la interfaz gráfica.  
+* Se efectuaron pruebas individuales de cada funcionalidad implementada.  
+
+Problemas encontrados: 
+* Fue necesario verificar la comunicación entre las distintas ventanas del sistema. 
+
+Solución aplicada: 
+* Se revisó el funcionamiento de cada opción del menú y se realizaron los ajustes necesarios para garantizar la navegación correcta. 
+
+Evidencia: 
+* Ventana principal.  
+* Ventana Acerca de.  
+* Menú principal.  
+* Pruebas de navegación.  
+
+
+Avance #10 Aaron Sandi 
+
+Fecha: 01/07/2026 
+Integrante: Aaron Sandi 
+
+Trabajo realizado: 
+* Se realizó la integración completa del código desarrollado por ambos integrantes del proyecto.  
+* Se revisaron y ajustaron las funciones implementadas durante todos los avances para asegurar la compatibilidad entre los módulos.  
+* Se corrigieron errores relacionados con llamadas entre funciones, parámetros, nombres de variables y organización del código.  
+* Se realizaron mejoras generales de legibilidad y mantenimiento del programa.  
+* Se ejecutaron pruebas completas del sistema para verificar el funcionamiento correcto de todas las opciones implementadas.  
+* Finalmente, se dejó el proyecto completamente integrado y listo para su entrega.  
+
+Problemas encontrados: 
+* Durante la integración surgieron algunos errores relacionados con la unión del código desarrollado por ambos integrantes, principalmente por diferencias en nombres de funciones y parámetros. 
+
+Solución aplicada: 
+* Se revisó el funcionamiento de cada módulo, realizando los ajustes necesarios hasta obtener un único sistema completamente funcional y estable. 
+
+Evidencia: 
+* Integración completa del E1 y E2.  
+* Corrección de errores de integración.  
+* Organización general del código.  
+* Pruebas finales de funcionamiento.  
+* Proyecto completamente funcional y listo para entrega. 
