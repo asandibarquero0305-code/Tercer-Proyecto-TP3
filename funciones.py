@@ -858,24 +858,6 @@ def generarIdsEspacios(tamano, tieneElectrico):
     return ids
 
 
-def calcularMonto(entrada, salida, cfg):
-    """
-    Funcionalidad: Calcula el monto a cobrar segun la duracion de la estadia y el tiempo de gracia configurado.
-    Entrada:
-    - entrada (str): Fecha y hora de entrada en formato '%Y-%m-%d %H:%M:%S'.
-    - salida (str): Fecha y hora de salida en formato '%Y-%m-%d %H:%M:%S'.
-    - cfg (Configuracion): Objeto con montoHora y tiempoGracia.
-    Salida:
-    - monto (float): Monto total en colones a cobrar.
-    """
-    dtEntrada = datetime.strptime(str(entrada), "%Y-%m-%d %H:%M:%S")
-    dtSalida = datetime.strptime(str(salida), "%Y-%m-%d %H:%M:%S")
-    minutos = (dtSalida - dtEntrada).total_seconds() / 60
-    minutosFacturables = max(0, minutos - cfg.tiempoGracia)
-    horas = minutosFacturables / 60
-    return round(horas * cfg.montoHora, 0)
-
-
 def generarCodigoQR(datos, nombreArchivo):
     """
     Funcionalidad: Genera un codigo QR con los datos indicados y lo guarda como imagen PNG.
